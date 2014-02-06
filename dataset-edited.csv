@@ -1,7 +1,7 @@
 This is the US Government Projects dataset. 
 All data is available under a public sector (CC0) license and you are free to use, reuse and redistribute it.
 
-IMPORTANT: This version of the dataset has been heavily manipulated from the orginal to introduce many many errors. This dataset SHOULD NOT be used to draw any conclusions about US government spending as your conclusion based upon this data is very likely to be very wrong and may lead to harm.
+IMPORTANT: This version of the dataset has been heavily manipulated from the original to introduce many many errors. This dataset SHOULD NOT be used to draw any conclusions about US government spending as your conclusion based upon this data is very likely to be very wrong and may lead to harm.
 
 "Unique Investment Identifier","Business Case ID","Agency Code","Agency Name","Investment Title","Project ID","Agency Project ID","Project Name","Project Description","Start Date","Completion Date (B1)","Planned Project Completion Date (B2)","Projected/Actual Project Completion Date (B2)","Lifecycle Cost","Schedule Variance (in days)","Schedule Variance (%)","Cost Variance ($ M)","Cost Variance (%)","Planned Cost ($ M)","Projected/Actual Cost ($ M)","Updated Date","Updated Time","Unique Project ID"
 005-000001723,212,5,"Department of Agriculture","AMS Infrastructure WAN and DMZ (AMSWAN)",656,,Operations,"Annual Agency Operations.",01/10/2011,2012-30-09,,,15.297,0,0,0,0,15.297,15.297,22/09/2011,10:22:25,1
