@@ -20,7 +20,7 @@ function drawGraph() {
     console.log(data)
     
     x.domain([0, d3.max(data, function(d) {
-      return d['Projected/Actual Cost ($ M)'];
+      return d.projectedActualCostMillions;
     })]);
   
     var bar = chart.selectAll('g')
@@ -50,7 +50,7 @@ function drawGraph() {
 
 function loadDataset(done) {
   function type(data) {
-    return {
+    var obj = {
       uniqueInvestmentIdentifier: data['Unique Investment Identifier'],
       businessCaseId: Number(data['Business Case ID']),
       agencyCode: Number(data['Agency Code']),
@@ -64,8 +64,24 @@ function loadDataset(done) {
       completionDate: new Date(['Completion Date (B1)']),
       plannedProjectCompletionDate: new Date(data['Planned Project Completion Date (B2)']),
       projectedProjectCompletionDate: new Date(data['Projected/Actual Project Completion Date (B2)']),
-      
-    }
+      lifecycleCostMillions: Number(data['Lifecycle Cost ($ M)']),
+      scheduleVarianceDays: Number(data['Schedule Variance (in days)']),
+      scheduleVariancePercentage: Number(data['Schedule Variance (%)']),
+      costVarianceMillions: Number(data['Cost Variance ($ M)']),
+      costVarianceDays: Number(data['Cost Variance (%)']),
+      plannedCostMillions: Number(data['Planned Cost ($ M)']),
+      projectedActualCostMillions: Number(data['Projected/Actual Cost ($ M)']),
+      uniqueProjectId: data['Unique Project ID']
+    };
+    
+    // Set updated date and time
+    obj.updated = new Date(data['Updated Date']);
+    var timeSplit = data['Updated Time'].split(':');
+    obj.updated.setHours(timeSplit[0]);
+    obj.updated.setMinutes(timeSplit[1]);
+    obj.updated.setSeconds(timeSplit[2]);
+   
+    return obj;
   }
   
   d3.xhr(DATASET_SRC).get(function(err, res) {
@@ -86,9 +102,9 @@ function loadDataset(done) {
       }
     }
     
-    var cleanedText = cleanedLines.join('\n');
+    var cleanedCsv = d3.csv.parse(cleanedLines.join('\n'), type);
     
-    d3.csv.parse(cleanedText, type, done);
+    done(err, cleanedCsv);
   });
 }
 
