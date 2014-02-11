@@ -1,0 +1,67 @@
+DoA, Agriculture Department
+Department of Agriculture
+
+DoC, Department of Comerce, Commerce Department
+Department of Commerce
+
+DoD, Defense Department
+Department of Defense
+
+Health Department
+Department of Health and Human Services
+
+the Department
+Department of the Interior   
+
+DoJ, Justice Department
+Department of Justice
+
+DoL, Labor Department
+Department of Labor
+
+DoS, State Department
+Department of State
+
+the Department
+Department of the Treasury
+
+SSA
+Social Security Administration
+
+DoE, Education Department
+Department of Education
+
+Energy Department, DoE
+Department of Energy
+
+DoT, Transportation Department, Department of Transport
+Department of Transportation
+
+GSA
+General Services Administration
+
+Homeland Department
+Department of Homeland Security
+
+
+4 other depts
+
+Veterans Department
+Department of Veterans Affairs
+
+4 other depts
+
+NRC
+Nuclear Regulatory Commission
+
+
+
+(.+?,.+?),.+?,.+?,(.+)
+
+\1,5,"Department of Agriculture",\2
+
+
+
+$m error
+(.+)"(.+) \(\$m\)"(.+)
+\1\2\3
