@@ -5,7 +5,7 @@ $(function() {
 });
 
 function drawGraph() {
-  var width = 420
+  var width = 1000
     , barHeight = 20;
     
   var x = d3.scale.linear()
@@ -16,13 +16,15 @@ function drawGraph() {
     
   loadDataset(function(err, data) {
     if (err) console.error(err);
-    
-    console.log(data)
-    
+
     x.domain([0, d3.max(data, function(d) {
       return d.projectedActualCostMillions;
     })]);
   
+    console.log(d3.max(data, function(d) {
+      return d.projectedActualCostMillions;
+    }))
+
     var bar = chart.selectAll('g')
         .data(data)
       .enter().append('g')
@@ -32,18 +34,18 @@ function drawGraph() {
 
     bar.append('rect')
       .attr('width', function(d) {
-        return x(d.value);
+        return x(d.projectedActualCostMillions);
       })
       .attr('height', barHeight - 1);
 
     bar.append('text')
       .attr('x', function(d) {
-        return x(d.value) - 3;
+        return x(d.projectedActualCostMillions) - 3;
       })
       .attr('y', barHeight / 2)
       .attr('dy', '.35em')
       .text(function(d) {
-        return d.value;
+        return d.projectedActualCostMillions;
       });
   });
 }
