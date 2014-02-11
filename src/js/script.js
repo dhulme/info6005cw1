@@ -20,10 +20,6 @@ function drawGraph() {
     x.domain([0, d3.max(data, function(d) {
       return d.projectedActualCostMillions;
     })]);
-  
-    console.log(d3.max(data, function(d) {
-      return d.projectedActualCostMillions;
-    }))
 
     var bar = chart.selectAll('g')
         .data(data)
