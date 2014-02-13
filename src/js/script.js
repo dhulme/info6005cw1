@@ -11,20 +11,6 @@ $(function() {
     
     // Initialize foundation
     $(document).foundation();
-    $.extend(window.Foundation.libs.tooltip.settings, {
-      additional_inheritable_classes : [],
-      tooltip_class : '.tooltip',
-      append_to: 'body',
-      touch_close_text: 'Tap To Close',
-      disable_for_touch: false,
-      hover_delay: 200,
-      tip_template : function (selector, content) {
-        return '<span data-selector="' + selector + '" class="' 
-          + Foundation.libs.tooltip.settings.tooltip_class.substring(1) 
-          + '">' + content + '<span class="nub"></span></span>';
-   
-      }
-    });
   });
 });
 
@@ -101,11 +87,9 @@ function drawSunburst(root) {
       .attr('projected-actual-cost-millions', function(d) {
         return d.projectedActualCostMillions ? d.projectedActualCostMillions.toString() : null;
       })
-      .attr('title', function(d) {
+      .attr('data-title', function(d) {
         return d.key;
       })
-      .attr('data-tooltip', '')
-      .attr('class', 'tip-right')
       .each(stash);
 
   d3.selectAll('input').on('change', function change() {
@@ -143,7 +127,10 @@ function drawSunburst(root) {
 function attachSunburstEvents() {
   $('#sunburstSvg path').mouseover(function(e) {
     var self = $(this);
-    console.log(self.data('name'));
+    $('#tooltip')
+      .css('left', e.clientX + 10)
+      .css('top', e.clientY)
+      .find('.content').html(self.data('title'));
   });
 }
 

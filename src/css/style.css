@@ -3,6 +3,9 @@
   display: block;
 }
 
-.tip-right {
-  margin: 100px;
+.tooltip {
+  display: inline; 
+  width: auto;
+  bottom: auto;
+  right: auto;
 }
