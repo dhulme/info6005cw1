@@ -1,50 +1,113 @@
 var DATASET_SRC = 'dataset-edited.csv';
 
 $(function() {
-  drawGraph();
-});
-
-function drawGraph() {
-  var width = 1000
-    , barHeight = 20;
-    
-  var x = d3.scale.linear()
-    .range([0, width]);
-    
-  var chart = d3.select('.chart')
-    .attr('width', width);
-    
   loadDataset(function(err, data) {
     if (err) console.error(err);
-
-    x.domain([0, d3.max(data, function(d) {
-      return d.projectedActualCostMillions;
-    })]);
-
-    var bar = chart.selectAll('g')
-        .data(data)
-      .enter().append('g')
-        .attr('transform', function(d, i) {
-          return 'translate(0,' + i * barHeight + ')';
-        });
-
-    bar.append('rect')
-      .attr('width', function(d) {
-        return x(d.projectedActualCostMillions);
-      })
-      .attr('height', barHeight - 1);
-
-    bar.append('text')
-      .attr('x', function(d) {
-        return x(d.projectedActualCostMillions) - 3;
-      })
-      .attr('y', barHeight / 2)
-      .attr('dy', '.35em')
-      .text(function(d) {
-        return d.projectedActualCostMillions;
-      });
+    
+    // Sunburst
+    var sunburstData = processDataForSunburst(data);
+    drawSunburst(sunburstData);
   });
+});
+
+function processDataForSunburst(data) {
+  var nest = d3.nest()
+    .key(function(d) {
+      return d.agencyName;
+    })
+    .key(function(d) {
+      return d.investmentTitle;
+    })
+    .rollup(function(leaves) {
+      var leaf;
+      for (leaf in leaves) {
+        leaves[leaf] = {
+          projectName: leaves[leaf].projectName,
+          projectedActualCostMillions: leaves[leaf].projectedActualCostMillions
+        };
+      }
+      return leaves;
+    })
+    .entries(data);
+    
+  return {
+    key: 'flare',
+    values: nest
+  };
 }
+
+function drawSunburst(root) {
+  var width = 960
+    , height = 700
+    , radius = Math.min(width, height) / 2
+    , color = d3.scale.category20c();
+
+  var svg = d3.select('body').append('svg')
+      .attr('width', width)
+      .attr('height', height)
+    .append('g')
+      .attr("transform", 'translate(' + width / 2 + ',' + height * .52 + ')');
+
+  var partition = d3.layout.partition()
+      .sort(null)
+      .size([2 * Math.PI, radius * radius])
+      .value(function(d) { 
+        return 1;
+      })
+      .children(function(d) {
+        return d.values;
+      });
+
+  var arc = d3.svg.arc()
+      .startAngle(function(d) { return d.x; })
+      .endAngle(function(d) { return d.x + d.dx; })
+      .innerRadius(function(d) { return Math.sqrt(d.y); })
+      .outerRadius(function(d) { return Math.sqrt(d.y + d.dy); });
+
+  var path = svg.datum(root).selectAll('path')
+      .data(partition.nodes)
+    .enter().append('path')
+      .attr('display', function(d) { return d.depth ? null : 'none'; }) // hide inner ring
+      .attr('d', arc)
+      .style('stroke', '#fff')
+      .style('fill', function(d) {
+        return color((d.children ? d : d.parent).key);
+      })
+      .style('fill-rule', 'evenodd')
+      .each(stash);
+
+  d3.selectAll('input').on('change', function change() {
+    var value = this.value === 'count'
+        ? function() { return 1; }
+        : function(d) { return d.size; };
+
+    path
+        .data(partition.value(value).nodes)
+      .transition()
+        .duration(1500)
+        .attrTween("d", arcTween);
+  });
+
+  // Stash the old values for transition.
+  function stash(d) {
+    d.x0 = d.x;
+    d.dx0 = d.dx;
+  }
+
+  // Interpolate the arcs in data space.
+  function arcTween(a) {
+    var i = d3.interpolate({x: a.x0, dx: a.dx0}, a);
+    return function(t) {
+      var b = i(t);
+      a.x0 = b.x;
+      a.dx0 = b.dx;
+      return arc(b);
+    };
+  }
+
+  d3.select(self.frameElement).style('height', height + 'px');
+}
+
 
 function loadDataset(done) {
   function type(data) {
@@ -104,17 +167,4 @@ function loadDataset(done) {
     
     done(err, cleanedCsv);
   });
-}
-
-function isUniqueInvestmentIdentifier(x) {
-  // Split by hypen
-  var xSplit = x.split('-');
-  
-  // Length should be 2
-  if (xSplit.length !== 2) return false;
-  
-  // Both parts should be numbers
-  if (isNaN(xSplit[0]) || isNaN(xSplit[1])) return false;
-  
-  return true;
 }
