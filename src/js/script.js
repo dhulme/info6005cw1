@@ -8,6 +8,23 @@ $(function() {
     var sunburstData = processDataForSunburst(data);
     drawSunburst(sunburstData);
     attachSunburstEvents();
+    
+    // Initialize foundation
+    $(document).foundation();
+    $.extend(window.Foundation.libs.tooltip.settings, {
+      additional_inheritable_classes : [],
+      tooltip_class : '.tooltip',
+      append_to: 'body',
+      touch_close_text: 'Tap To Close',
+      disable_for_touch: false,
+      hover_delay: 200,
+      tip_template : function (selector, content) {
+        return '<span data-selector="' + selector + '" class="' 
+          + Foundation.libs.tooltip.settings.tooltip_class.substring(1) 
+          + '">' + content + '<span class="nub"></span></span>';
+   
+      }
+    });
   });
 });
 
@@ -84,9 +101,11 @@ function drawSunburst(root) {
       .attr('projected-actual-cost-millions', function(d) {
         return d.projectedActualCostMillions ? d.projectedActualCostMillions.toString() : null;
       })
-      .attr('data-name', function(d) {
+      .attr('title', function(d) {
         return d.key;
       })
+      .attr('data-tooltip', '')
+      .attr('class', 'tip-right')
       .each(stash);
 
   d3.selectAll('input').on('change', function change() {
