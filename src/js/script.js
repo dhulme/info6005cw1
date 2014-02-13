@@ -7,6 +7,7 @@ $(function() {
     // Sunburst
     var sunburstData = processDataForSunburst(data);
     drawSunburst(sunburstData);
+    attachSunburstEvents();
   });
 });
 
@@ -36,17 +37,18 @@ function processDataForSunburst(data) {
   };
 }
 
+// Function modified from http://bl.ocks.org/mbostock/406342
 function drawSunburst(root) {
   var width = 960
     , height = 700
     , radius = Math.min(width, height) / 2
     , color = d3.scale.category20c();
 
-  var svg = d3.select('body').append('svg')
+  var svg = d3.select('#sunburstSvg')
       .attr('width', width)
       .attr('height', height)
     .append('g')
-      .attr("transform", 'translate(' + width / 2 + ',' + height * .52 + ')');
+      .attr('transform', 'translate(' + width / 2 + ',' + height * .5 + ')');
 
   var partition = d3.layout.partition()
       .sort(null)
@@ -67,13 +69,24 @@ function drawSunburst(root) {
   var path = svg.datum(root).selectAll('path')
       .data(partition.nodes)
     .enter().append('path')
-      .attr('display', function(d) { return d.depth ? null : 'none'; }) // hide inner ring
+      .attr('display', function(d) { 
+        // Hide inner and outermost ring
+        if (!d.depth || d.depth > 2) {
+          return 'none';
+        }
+      })
       .attr('d', arc)
       .style('stroke', '#fff')
       .style('fill', function(d) {
         return color((d.children ? d : d.parent).key);
       })
       .style('fill-rule', 'evenodd')
+      .attr('projected-actual-cost-millions', function(d) {
+        return d.projectedActualCostMillions ? d.projectedActualCostMillions.toString() : null;
+      })
+      .attr('data-name', function(d) {
+        return d.key;
+      })
       .each(stash);
 
   d3.selectAll('input').on('change', function change() {
@@ -108,6 +121,12 @@ function drawSunburst(root) {
   d3.select(self.frameElement).style('height', height + 'px');
 }
 
+function attachSunburstEvents() {
+  $('#sunburstSvg path').mouseover(function(e) {
+    var self = $(this);
+    console.log(self.data('name'));
+  });
+}
 
 function loadDataset(done) {
   function type(data) {

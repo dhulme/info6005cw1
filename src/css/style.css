@@ -1,9 +1,4 @@
-.chart rect {
-  fill: steelblue;
-}
-
-.chart text {
-  fill: white;
-  font: 10px sans-serif;
-  text-anchor: end;
+#sunburstSvg {
+  margin: auto;
+  display: block;
 }
