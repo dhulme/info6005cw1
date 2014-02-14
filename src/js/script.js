@@ -114,10 +114,25 @@ function drawSunburst(root) {
       });
 
   d3.selectAll('#sunburstControls input').on('change', function change() {
-    var value = this.value === 'count'
-        ? function() { return 1; }
-        : function(d) { return d.size; };
-    console.log(this.value)
+    //var value = this.value === 'count'
+//        ? function() { return 1; }
+//        : function(d) { return d.size; };
+    
+    var value;
+    switch (this.id) {
+      case 'actualSpendingRadio':
+        value = function(d) {
+          return d.attr('data-projected-actual-cost-millions');
+        };
+        break;
+      case 'plannedSpendingRadio':
+        value = function(d) {
+          return d.attr('data-planned-cost-millions');
+        };
+        break;
+      default:
+        value = null;
+    }
 
     path
         .data(partition.value(value).nodes)
