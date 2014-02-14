@@ -87,11 +87,27 @@ function drawSunburst(root) {
       .attr('data-projected-actual-cost-millions', function(d) {
         // If leaf node, just return
         if (d.projectedActualCostMillions) {
-          console.log(d);
           return d.projectedActualCostMillions;
-        } else {
-          return null;
         }
+
+        // Else will have to examine leaf nodes
+        var total = 0;
+        
+        // This is expensive. Should look at merging into existing functions.
+        function scanNode(node) {
+          if (node.hasOwnProperty('children')) {
+            var child;
+            for (child in node.children) {
+              scanNode(node.children[child]);
+            }
+          } else {
+            total += node.projectedActualCostMillions;
+          }
+        }
+        
+        scanNode(d);
+        
+        return total;
       })
       .attr('data-title', function(d) {
         return d.key || d.projectName;
@@ -136,7 +152,9 @@ function attachSunburstEvents() {
     .mouseover(function(e) {
       var self = $(this);
       
+      // Using http://stackoverflow.com/questions/11832914/round-up-to-2-decimal-places-in-javascript
       var cost2DP = Math.round((Number(self.data('projectedActualCostMillions')) + 0.00001) * 100) / 100;
+      
       var tooltipContent = self.data('title') + ' (' + cost2DP + ' $M)';
       
       tooltip
