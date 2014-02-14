@@ -74,7 +74,7 @@ function drawSunburst(root) {
     .enter().append('path')
       .attr('display', function(d) { 
         // Hide inner and outermost ring
-        if (!d.depth || d.depth > 2) {
+        if (!d.depth || d.depth > 3) {
           return 'none';
         }
       })
@@ -84,11 +84,17 @@ function drawSunburst(root) {
         return color((d.children ? d : d.parent).key);
       })
       .style('fill-rule', 'evenodd')
-      .attr('projected-actual-cost-millions', function(d) {
-        return d.projectedActualCostMillions ? d.projectedActualCostMillions.toString() : null;
+      .attr('data-projected-actual-cost-millions', function(d) {
+        // If leaf node, just return
+        if (d.projectedActualCostMillions) {
+          console.log(d);
+          return d.projectedActualCostMillions;
+        } else {
+          return null;
+        }
       })
       .attr('data-title', function(d) {
-        return d.key;
+        return d.key || d.projectName;
       })
       .each(stash);
 
@@ -125,13 +131,23 @@ function drawSunburst(root) {
 }
 
 function attachSunburstEvents() {
-  $('#sunburstSvg path').mouseover(function(e) {
-    var self = $(this);
-    $('#tooltip')
-      .css('left', e.clientX + 10)
-      .css('top', e.clientY)
-      .find('.content').html(self.data('title'));
-  });
+  var tooltip = $('#tooltip');
+  $('#sunburstSvg path')
+    .mouseover(function(e) {
+      var self = $(this);
+      
+      var cost2DP = Math.round((Number(self.data('projectedActualCostMillions')) + 0.00001) * 100) / 100;
+      var tooltipContent = self.data('title') + ' (' + cost2DP + ' $M)';
+      
+      tooltip
+        .show()
+        .css('left', e.clientX + 10)
+        .css('top', e.clientY)
+        .find('.content').html(tooltipContent);
+    })
+    .mouseleave(function(e) {
+      tooltip.hide();
+    });
 }
 
 function loadDataset(done) {
