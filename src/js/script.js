@@ -57,8 +57,9 @@ function drawSunburst(root) {
   var partition = d3.layout.partition()
       .sort(null)
       .size([2 * Math.PI, radius * radius])
-      .value(function(d) { 
-        return 1;
+      .value(function(d) {
+        // Default mode is to show actual cost
+        return d.projectedActualCostMillions;
       })
       .children(function(d) {
         return d.values;
@@ -75,7 +76,7 @@ function drawSunburst(root) {
     .enter().append('path')
       .attr('display', function(d) { 
         // Hide inner and outermost ring
-        if (!d.depth || d.depth > 2) {
+        if (!d.depth || d.depth > 3) {
           return 'none';
         }
       })
@@ -114,20 +115,16 @@ function drawSunburst(root) {
       });
 
   d3.selectAll('#sunburstControls input').on('change', function change() {
-    //var value = this.value === 'count'
-//        ? function() { return 1; }
-//        : function(d) { return d.size; };
-    
     var value;
     switch (this.id) {
       case 'actualSpendingRadio':
         value = function(d) {
-          return d.attr('data-projected-actual-cost-millions');
+          return d.projectedActualCostMillions;
         };
         break;
       case 'plannedSpendingRadio':
         value = function(d) {
-          return d.attr('data-planned-cost-millions');
+          return d.plannedCostMillions;
         };
         break;
       default:
@@ -138,7 +135,7 @@ function drawSunburst(root) {
         .data(partition.value(value).nodes)
       .transition()
         .duration(1500)
-        .attrTween("d", arcTween);
+        .attrTween('d', arcTween);
   });
 
   // Stash the old values for transition.
@@ -167,8 +164,12 @@ function attachSunburstEvents() {
     .mouseover(function(e) {
       var self = $(this);
       
+      var costMillions = $('#actualSpendingRadio').prop('checked')
+        ? self.data('projectedActualCostMillions')
+        : self.data('plannedCostMillions');
+        
       // Using http://stackoverflow.com/questions/11832914/round-up-to-2-decimal-places-in-javascript
-      var cost2DP = Math.round((Number(self.data('projectedActualCostMillions')) + 0.00001) * 100) / 100;
+      var cost2DP = Math.round((Number(costMillions) + 0.00001) * 100) / 100;
       
       var tooltipContent = self.data('title') + ' (' + cost2DP + ' $M)';
       
