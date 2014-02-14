@@ -13,7 +13,36 @@
     <script src="js/script.js"></script>
   </head>
   <body>
-    <svg id="sunburstSvg"></svg>
+    <nav class="top-bar" data-topbar>
+      <ul class="title-area">
+        <li class="name">
+          <h1><a href="/">INFO6005 Coursework 1</a></h1>
+        </li>
+      </ul>
+
+      <section class="top-bar-section">
+        <!-- Left Nav Section -->
+        <ul class="left">
+          <li class="active"><a href="#">Visualisation 1</a></li>
+          <li><a href="#">Visualisation 2</a></li>
+        </ul>
+      </section>
+    </nav>
+    
+    <section class="content">
+      <div class="row">
+        <div id="svgContainer" class="small-8 column">
+          <svg id="sunburstSvg"></svg>
+        </div>
+        <div class="small-4 column">
+          <div class="panel">
+            <h5 style="font-weight: bold;">US Spending</h5>
+            <p>This graph shows something blah blah blah</p>
+          </div>
+        </div>
+      </div>
+    </section>
+    
     <div class="tooltip tip-right" id="tooltip">
       <span class="content"></span>
       <span class="nub"></span>

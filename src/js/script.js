@@ -4,13 +4,13 @@ $(function() {
   loadDataset(function(err, data) {
     if (err) console.error(err);
     
+    // Initialize foundation
+    $(document).foundation();
+    
     // Sunburst
     var sunburstData = processDataForSunburst(data);
     drawSunburst(sunburstData);
     attachSunburstEvents();
-    
-    // Initialize foundation
-    $(document).foundation();
   });
 });
 
@@ -42,8 +42,8 @@ function processDataForSunburst(data) {
 
 // Function modified from http://bl.ocks.org/mbostock/406342
 function drawSunburst(root) {
-  var width = 960
-    , height = 700
+  var width = $('#svgContainer').width()
+    , height = 600
     , radius = Math.min(width, height) / 2
     , color = d3.scale.category20c();
 
@@ -74,7 +74,7 @@ function drawSunburst(root) {
     .enter().append('path')
       .attr('display', function(d) { 
         // Hide inner and outermost ring
-        if (!d.depth || d.depth > 3) {
+        if (!d.depth || d.depth > 2) {
           return 'none';
         }
       })

@@ -9,3 +9,7 @@
   bottom: auto;
   right: auto;
 }
+
+section.content {
+  margin-top: 10px;
+}
