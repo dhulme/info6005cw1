@@ -27,7 +27,8 @@ function processDataForSunburst(data) {
       for (leaf in leaves) {
         leaves[leaf] = {
           projectName: leaves[leaf].projectName,
-          projectedActualCostMillions: leaves[leaf].projectedActualCostMillions
+          projectedActualCostMillions: leaves[leaf].projectedActualCostMillions,
+          plannedCostMillions: leaves[leaf].plannedCostMillions
         };
       }
       return leaves;
@@ -84,14 +85,14 @@ function drawSunburst(root) {
         return color((d.children ? d : d.parent).key);
       })
       .style('fill-rule', 'evenodd')
-      .attr('data-projected-actual-cost-millions', function(d) {
-        // If leaf node, just return
-        if (d.projectedActualCostMillions) {
-          return d.projectedActualCostMillions;
-        }
-
+      .attr('data-title', function(d) {
+        return d.key || d.projectName;
+      })
+      .each(stash)
+      .each(function(d) {
         // Else will have to examine leaf nodes
-        var total = 0;
+        var plannedCostMillionsTotal = 0
+          , projectedActualCostMillionsTotal = 0;
         
         // This is expensive. Should look at merging into existing functions.
         function scanNode(node) {
@@ -101,23 +102,22 @@ function drawSunburst(root) {
               scanNode(node.children[child]);
             }
           } else {
-            total += node.projectedActualCostMillions;
+            projectedActualCostMillionsTotal += node.projectedActualCostMillions;
+            plannedCostMillionsTotal += node.plannedCostMillions;
           }
         }
         
         scanNode(d);
         
-        return total;
-      })
-      .attr('data-title', function(d) {
-        return d.key || d.projectName;
-      })
-      .each(stash);
+        d3.select(this).attr('data-planned-cost-millions', plannedCostMillionsTotal);
+        d3.select(this).attr('data-projected-actual-cost-millions', projectedActualCostMillionsTotal);
+      });
 
-  d3.selectAll('input').on('change', function change() {
+  d3.selectAll('#sunburstControls input').on('change', function change() {
     var value = this.value === 'count'
         ? function() { return 1; }
         : function(d) { return d.size; };
+    console.log(this.value)
 
     path
         .data(partition.value(value).nodes)
