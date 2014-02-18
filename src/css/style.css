@@ -17,3 +17,7 @@ section.content {
 #resetSunburstButton {
   display: block;
 }
+
+#visualisation2 {
+  display: none;
+}

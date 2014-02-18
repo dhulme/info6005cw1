@@ -21,14 +21,14 @@
       </ul>
 
       <section class="top-bar-section">
-        <ul class="left">
-          <li class="active"><a href="#">Visualisation 1</a></li>
-          <li><a href="#">Visualisation 2</a></li>
+        <ul class="left" id="visList">
+          <li class="active"><a href="#" data-visualisation-id="visulisation1">Visualisation 1</a></li>
+          <li><a href="#" data-visualisation-id="visualisation2">Visualisation 2</a></li>
         </ul>
       </section>
     </nav>
     
-    <section class="content">
+    <section id="visulisation1" class="content">
       <div class="row">
         <div id="svgContainer" class="small-8 column">
           <svg id="sunburstSvg"></svg>
@@ -51,6 +51,10 @@
           </div>
         </div>
       </div>
+    </section>
+    
+    <section id="visulisation2" class="content">
+      
     </section>
     
     <div class="tooltip tip-right" id="tooltip">

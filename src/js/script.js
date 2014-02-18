@@ -7,8 +7,10 @@ $(function() {
     // Initialize foundation
     $(document).foundation();
     
+    attachGlobalEvents();
+    
     // Sunburst
-    var sunburstData = processDataForSunburst(data);
+    sunburstData = processDataForSunburst(data);
     drawSunburst(sunburstData);
     attachSunburstEvents();
   });
@@ -36,7 +38,7 @@ function processDataForSunburst(data) {
     .entries(data);
     
   return {
-    key: 'US Deparatment Spending',
+    key: 'US Department Spending',
     values: nest
   };
 }
@@ -210,8 +212,8 @@ function attachSunburstEvents() {
     });
     
   $('#resetSunburstButton').click(function() {
-    $('path').first().d3Click()
-  })
+    $('path').first().d3Click();
+  });
 }
 
 function loadDataset(done) {
@@ -271,6 +273,17 @@ function loadDataset(done) {
     var cleanedCsv = d3.csv.parse(cleanedLines.join('\n'), type);
     
     done(err, cleanedCsv);
+  });
+}
+
+function attachGlobalEvents() {
+  $('#visList a').click(function() {
+    var self = $(this);
+    $('#visList').find('li').removeClass('active');
+    self.parent().addClass('active');
+
+    $('section.content').hide();
+    $('#' + self.data('visualisationId')).show();
   });
 }
 
