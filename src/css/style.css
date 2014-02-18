@@ -13,3 +13,7 @@
 section.content {
   margin-top: 10px;
 }
+
+#resetSunburstButton {
+  display: block;
+}

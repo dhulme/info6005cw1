@@ -36,7 +36,7 @@ function processDataForSunburst(data) {
     .entries(data);
     
   return {
-    key: 'flare',
+    key: 'US Deparatment Spending',
     values: nest
   };
 }
@@ -82,15 +82,20 @@ function drawSunburst(root) {
       .data(partition.nodes)
     .enter().append('path')
       .attr('display', function(d) { 
-        // Hide inner and outermost ring
-        if (!d.depth || d.depth > 2) {
-          return 'none';
-        }
+        // Hide innermost ring
+        //if (!d.depth || d.depth > 2) {
+        //  return 'none';
+        //}
       })
       .attr('d', arc)
       .style('stroke', '#fff')
       .style('fill', function(d) {
-        return color((d.children ? d : d.parent).key);
+        // Make inner most ring white
+        if (!d.depth) {
+          return '#fff';
+        } else {
+          return color((d.children ? d : d.parent).key);
+        }
       })
       .style('fill-rule', 'evenodd')
       .attr('data-title', function(d) {
@@ -148,11 +153,11 @@ function drawSunburst(root) {
       .transition()
         .duration(1500)
         .attrTween('d', function(d) {
-          var i = d3.interpolate({x: a.x0, dx: a.dx0}, a);
+          var i = d3.interpolate({x: d.x0, dx: d.dx0}, d);
           return function(t) {
             var b = i(t);
-            a.x0 = b.x;
-            a.dx0 = b.dx;
+            d.x0 = b.x;
+            d.dx0 = b.dx;
             return arc(b);
           };
         });
@@ -203,6 +208,10 @@ function attachSunburstEvents() {
     .mouseleave(function(e) {
       tooltip.hide();
     });
+    
+  $('#resetSunburstButton').click(function() {
+    $('path').first().d3Click()
+  })
 }
 
 function loadDataset(done) {
@@ -264,3 +273,13 @@ function loadDataset(done) {
     done(err, cleanedCsv);
   });
 }
+
+// From http://stackoverflow.com/questions/9063383/how-to-invoke-click-event-programmaticaly-in-d3
+jQuery.fn.d3Click = function () {
+  this.each(function (i, e) {
+    var evt = document.createEvent("MouseEvents");
+    evt.initMouseEvent("click", true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+
+    e.dispatchEvent(evt);
+  });
+};
