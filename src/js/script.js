@@ -41,22 +41,29 @@ function processDataForSunburst(data) {
   };
 }
 
-// Function modified from http://bl.ocks.org/mbostock/406342
+// Function modified from http://bl.ocks.org/mbostock/406342 and
+// http://bl.ocks.org/mbostock/4348373
 function drawSunburst(root) {
   var width = $('#svgContainer').width()
     , height = 600
     , radius = Math.min(width, height) / 2
     , color = d3.scale.category20c();
+  
+  var x = d3.scale.linear()
+    .range([0, 2 * Math.PI]);
+
+  var y = d3.scale.sqrt()
+    .range([0, radius]);
 
   var svg = d3.select('#sunburstSvg')
       .attr('width', width)
       .attr('height', height)
     .append('g')
-      .attr('transform', 'translate(' + width / 2 + ',' + height * .5 + ')');
-
+      .attr('transform', 'translate(' + width / 2 + ',' + height / 2 + ')');
+      
   var partition = d3.layout.partition()
       .sort(null)
-      .size([2 * Math.PI, radius * radius])
+      //.size([2 * Math.PI, radius * radius])
       .value(function(d) {
         // Default mode is to show actual cost
         return d.projectedActualCostMillions;
@@ -66,17 +73,17 @@ function drawSunburst(root) {
       });
 
   var arc = d3.svg.arc()
-      .startAngle(function(d) { return d.x; })
-      .endAngle(function(d) { return d.x + d.dx; })
-      .innerRadius(function(d) { return Math.sqrt(d.y); })
-      .outerRadius(function(d) { return Math.sqrt(d.y + d.dy); });
+    .startAngle(function(d) { return Math.max(0, Math.min(2 * Math.PI, x(d.x))); })
+    .endAngle(function(d) { return Math.max(0, Math.min(2 * Math.PI, x(d.x + d.dx))); })
+    .innerRadius(function(d) { return Math.max(0, y(d.y)); })
+    .outerRadius(function(d) { return Math.max(0, y(d.y + d.dy)); });
 
   var path = svg.datum(root).selectAll('path')
       .data(partition.nodes)
     .enter().append('path')
       .attr('display', function(d) { 
         // Hide inner and outermost ring
-        if (!d.depth || d.depth > 3) {
+        if (!d.depth || d.depth > 2) {
           return 'none';
         }
       })
@@ -88,6 +95,11 @@ function drawSunburst(root) {
       .style('fill-rule', 'evenodd')
       .attr('data-title', function(d) {
         return d.key || d.projectName;
+      })
+      .on('click', function(d) {
+        path.transition()
+          .duration(750)
+          .attrTween('d', zoom(d));
       })
       .each(stash)
       .each(function(d) {
@@ -135,7 +147,15 @@ function drawSunburst(root) {
         .data(partition.value(value).nodes)
       .transition()
         .duration(1500)
-        .attrTween('d', arcTween);
+        .attrTween('d', function(d) {
+          var i = d3.interpolate({x: a.x0, dx: a.dx0}, a);
+          return function(t) {
+            var b = i(t);
+            a.x0 = b.x;
+            a.dx0 = b.dx;
+            return arc(b);
+          };
+        });
   });
 
   // Stash the old values for transition.
@@ -144,14 +164,15 @@ function drawSunburst(root) {
     d.dx0 = d.dx;
   }
 
-  // Interpolate the arcs in data space.
-  function arcTween(a) {
-    var i = d3.interpolate({x: a.x0, dx: a.dx0}, a);
-    return function(t) {
-      var b = i(t);
-      a.x0 = b.x;
-      a.dx0 = b.dx;
-      return arc(b);
+  // Interpolate the arcs in data space
+  function zoom(d) {
+    var xd = d3.interpolate(x.domain(), [d.x, d.x + d.dx]),
+        yd = d3.interpolate(y.domain(), [d.y, 1]),
+        yr = d3.interpolate(y.range(), [d.y ? 20 : 0, radius]);
+    return function(d, i) {
+      return i
+          ? function(t) { return arc(d); }
+          : function(t) { x.domain(xd(t)); y.domain(yd(t)).range(yr(t)); return arc(d); };
     };
   }
 
