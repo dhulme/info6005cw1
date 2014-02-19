@@ -25,3 +25,14 @@ section.content {
 .panel h5 {
   font-weight: bold;
 }
+
+
+#barSvg rect { 
+  fill: steelblue;
+}
+
+#barSvg text {
+  fill: white;
+  font: 10px sans-serif;
+  text-anchor: end;
+}
