@@ -4,19 +4,23 @@ $(function() {
   loadDataset(function(err, data) {
     if (err) console.error(err);
     
-    // Initialize foundation
+    // Initialize global UI
     $(document).foundation();
-    
     attachGlobalEvents();
     
+    processedData = processData(data);
+    
     // Sunburst
-    sunburstData = processDataForSunburst(data);
-    drawSunburst(sunburstData);
+    drawSunburst(processedData);
     attachSunburstEvents();
+    
+    // Bar
+    //drawBar(processedData);
+    
   });
 });
 
-function processDataForSunburst(data) {
+function processData(data) {
   var nest = d3.nest()
     .key(function(d) {
       return d.agencyName;
@@ -30,23 +34,48 @@ function processDataForSunburst(data) {
         leaves[leaf] = {
           projectName: leaves[leaf].projectName,
           projectedActualCostMillions: leaves[leaf].projectedActualCostMillions,
-          plannedCostMillions: leaves[leaf].plannedCostMillions
+          plannedCostMillions: leaves[leaf].plannedCostMillions,
+          costVarianceMillions: leaves[leaf].costVarianceMillions
         };
       }
       return leaves;
     })
     .entries(data);
     
-  return {
+  var tree = {
     key: 'US Department Spending',
     values: nest
   };
+
+  function scanNode(node) {
+    if (node.hasOwnProperty('values')) {
+      node.projectedActualCostMillions = 0;
+      node.plannedCostMillions = 0;
+      node.costVarianceMillions = 0;
+      
+      var child;
+      for (child in node.values) {
+        node.values[child].parent = node;
+        scanNode(node.values[child]);
+      }
+    }
+    
+    if (node.parent) {
+      node.parent.projectedActualCostMillions += node.projectedActualCostMillions;
+      node.parent.plannedCostMillions += node.plannedCostMillions;
+      node.parent.costVarianceMillions += node.costVarianceMillions;
+    }
+  }
+  
+  scanNode(tree);
+  
+  return tree;
 }
 
 // Function modified from http://bl.ocks.org/mbostock/406342 and
 // http://bl.ocks.org/mbostock/4348373
 function drawSunburst(root) {
-  var width = $('#svgContainer').width()
+  var width = $('#sunburstSvg').parents('.svg-container').width()
     , height = 600
     , radius = Math.min(width, height) / 2
     , color = d3.scale.category20c();
@@ -108,29 +137,14 @@ function drawSunburst(root) {
           .duration(750)
           .attrTween('d', zoom(d));
       })
-      .each(stash)
       .each(function(d) {
-        // Else will have to examine leaf nodes
-        var plannedCostMillionsTotal = 0
-          , projectedActualCostMillionsTotal = 0;
+        // Stash old values for transition
+        d.x0 = d.x;
+        d.dx0 = d.dx;
         
-        // This is expensive. Should look at merging into existing functions.
-        function scanNode(node) {
-          if (node.hasOwnProperty('children')) {
-            var child;
-            for (child in node.children) {
-              scanNode(node.children[child]);
-            }
-          } else {
-            projectedActualCostMillionsTotal += node.projectedActualCostMillions;
-            plannedCostMillionsTotal += node.plannedCostMillions;
-          }
-        }
-        
-        scanNode(d);
-        
-        d3.select(this).attr('data-planned-cost-millions', plannedCostMillionsTotal);
-        d3.select(this).attr('data-projected-actual-cost-millions', projectedActualCostMillionsTotal);
+        // Save data values to DOM object
+        d3.select(this).attr('data-planned-cost-millions', d.plannedCostMillions);
+        d3.select(this).attr('data-projected-actual-cost-millions', d.projectedActualCostMillions);
       });
 
   d3.selectAll('#sunburstControls input').on('change', function change() {
@@ -164,12 +178,6 @@ function drawSunburst(root) {
           };
         });
   });
-
-  // Stash the old values for transition.
-  function stash(d) {
-    d.x0 = d.x;
-    d.dx0 = d.dx;
-  }
 
   // Interpolate the arcs in data space
   function zoom(d) {
@@ -214,6 +222,10 @@ function attachSunburstEvents() {
   $('#resetSunburstButton').click(function() {
     $('path').first().d3Click();
   });
+}
+
+function drawBar() {
+  
 }
 
 function loadDataset(done) {

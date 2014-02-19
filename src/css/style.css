@@ -21,3 +21,7 @@ section.content {
 #visualisation2 {
   display: none;
 }
+
+.panel h5 {
+  font-weight: bold;
+}
