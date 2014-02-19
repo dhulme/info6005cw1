@@ -51,7 +51,6 @@ function processData(data) {
     if (node.hasOwnProperty('values')) {
       node.projectedActualCostMillions = 0;
       node.plannedCostMillions = 0;
-      node.costVarianceMillions = 0;
       
       var child;
       for (child in node.values) {
@@ -63,7 +62,6 @@ function processData(data) {
     if (node.parent) {
       node.parent.projectedActualCostMillions += node.projectedActualCostMillions;
       node.parent.plannedCostMillions += node.plannedCostMillions;
-      node.parent.costVariancePercentage += node.costVarianceMillions;
     }
   }
   
@@ -224,7 +222,7 @@ function attachSunburstEvents() {
   });
 }
 
-// Based on http://bost.ocks.org/mike/bar/2/
+// Functioned modified from http://bost.ocks.org/mike/bar/2/
 function drawBar(data) {
   var width = $('#barSvg').parents('.svg-container').width()
     , barHeight = 20;
@@ -233,7 +231,10 @@ function drawBar(data) {
 
   var x = d3.scale.linear()
     .domain([0, d3.max(data, function(d) {
-      return d.costVarianceMillions;
+      // Calculate cost variance as a percentage
+      
+      d.costVariancePercentage = d.projectedActualCostMillions / d.plannedCostMillions;
+      return d.costVariancePercentage;
     })])
     .range([0, width]);
 
@@ -250,18 +251,21 @@ function drawBar(data) {
 
   bar.append('rect')
     .attr('width', function(d) {
-      return x(d.costVarianceMillions);
+      return x(d.costVariancePercentage);
     })
     .attr('height', barHeight - 1);
 
   bar.append('text')
     .attr('x', function(d) {
-      return x(d.costVarianceMillions) - 3;
+      return x(d.costVariancePercentage) - 3;
     })
     .attr('y', barHeight / 2)
     .attr('dy', '.35em')
     .text(function(d) { 
-      return d.key; 
+      // Using http://stackoverflow.com/questions/11832914/round-up-to-2-decimal-places-in-javascript
+      var variance2DP = Math.round((Number(d.costVariancePercentage) + 0.00001) * 100) / 100;
+      
+      return d.key + ' (' + variance2DP + '%)'; 
     });
 }
 
