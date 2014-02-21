@@ -316,28 +316,7 @@ function loadDataset(done) {
     return obj;
   }
   
-  d3.xhr(DATASET_SRC).get(function(err, res) {
-    var rawText = res.responseText;
-    
-    var rawLines = rawText.split('\n')
-      , cleanedLines = [];
-   
-    var i = 0
-      , line = '';
-      
-    for (i in rawLines) {
-      line = rawLines[i];
-      
-      // If line is comment, ignore
-      if (line[0] !== '#') {
-        cleanedLines.push(line);
-      }
-    }
-    
-    var cleanedCsv = d3.csv.parse(cleanedLines.join('\n'), type);
-    
-    done(err, cleanedCsv);
-  });
+  d3.csv(DATASET_SRC, type, done);
 }
 
 function attachGlobalEvents() {
