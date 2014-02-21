@@ -224,10 +224,12 @@ function attachSunburstEvents() {
 
 // Functioned modified from http://bost.ocks.org/mike/bar/2/
 function drawBar(data) {
-  var width = $('#barSvg').parents('.svg-container').width()
-    , barHeight = 20;
-    
   data = data.children;
+  
+  var width = $('#barSvg').parents('.svg-container').width()
+    , barHeight = 20
+    , height = barHeight * data.length;
+    
 
   var x = d3.scale.linear()
     .domain([0, d3.max(data, function(d) {
@@ -241,6 +243,15 @@ function drawBar(data) {
   var chart = d3.select('#barSvg')
     .attr('width', width)
     .attr('height', barHeight * data.length);
+    
+  var xAxis = d3.svg.axis()
+    .scale(x)
+    .orient('bottom');
+    
+  chart.append('g')
+    .attr('class', 'x axis')
+    .attr('transform', 'translate(0, ' + height + ')')
+    .call(xAxis);
 
   var bar = chart.selectAll('g')
       .data(data)
