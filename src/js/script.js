@@ -226,23 +226,35 @@ function attachSunburstEvents() {
 function drawBar(data) {
   data = data.children;
   
-  var width = $('#barSvg').parents('.svg-container').width()
+  var svgContainerWidth = $('#barSvg').parents('.svg-container').width()
+    , margin = {
+      top: 20,
+      right: 30,
+      bottom: 30,
+      left: 40
+    }
+    , width = svgContainerWidth - margin.left - margin.right
     , barHeight = 20
     , height = barHeight * data.length;
     
 
   var x = d3.scale.linear()
-    .domain([0, d3.max(data, function(d) {
+    .domain([d3.min(data, function(d) {
+      d.costVariancePercentage = ((d.projectedActualCostMillions / d.plannedCostMillions) * 100) - 100;
+      return d.costVariancePercentage;
+    }), d3.max(data, function(d) {
       // Calculate cost variance as a percentage
-      
-      d.costVariancePercentage = d.projectedActualCostMillions / d.plannedCostMillions;
+      d.costVariancePercentage = ((d.projectedActualCostMillions / d.plannedCostMillions) * 100) - 100;
+      //console.log(d.key + ' ' + d.costVariancePercentage)
       return d.costVariancePercentage;
     })])
     .range([0, width]);
 
   var chart = d3.select('#barSvg')
-    .attr('width', width)
-    .attr('height', barHeight * data.length);
+    .attr('width', width + margin.left + margin.right)
+    .attr('height', height + margin.top + margin.bottom)
+    .append('g')
+      .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
     
   var xAxis = d3.svg.axis()
     .scale(x)
@@ -253,20 +265,20 @@ function drawBar(data) {
     .attr('transform', 'translate(0, ' + height + ')')
     .call(xAxis);
 
-  var bar = chart.selectAll('g')
-      .data(data)
-    .enter().append('g')
-      .attr('transform', function(d, i) {
-        return 'translate(0,' + i * barHeight + ')';
-      });
-
-  bar.append('rect')
+  var g = chart.selectAll('.bar').data(data).enter()
+    .append('g')
+       .attr('transform', function(d, i) {
+          return 'translate(0,' + i * barHeight + ')';
+        });
+    
+  g.append('rect')
+    .attr('class', 'bar')
     .attr('width', function(d) {
       return x(d.costVariancePercentage);
     })
     .attr('height', barHeight - 1);
 
-  bar.append('text')
+  g.append('text')
     .attr('x', function(d) {
       return x(d.costVariancePercentage) - 3;
     })
@@ -275,7 +287,7 @@ function drawBar(data) {
     .text(function(d) { 
       // Using http://stackoverflow.com/questions/11832914/round-up-to-2-decimal-places-in-javascript
       var variance2DP = Math.round((Number(d.costVariancePercentage) + 0.00001) * 100) / 100;
-      
+
       return d.key + ' (' + variance2DP + '%)'; 
     });
 }
