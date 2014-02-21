@@ -226,26 +226,27 @@ function attachSunburstEvents() {
 function drawBar(data) {
   data = data.children;
   
+  // Compute costVariancePercentage
+  data.forEach(function(d) {
+    d.costVariancePercentage = ((d.projectedActualCostMillions / d.plannedCostMillions) * 100) - 100;
+  });
+  
   var svgContainerWidth = $('#barSvg').parents('.svg-container').width()
     , margin = {
       top: 20,
       right: 30,
-      bottom: 30,
+      bottom: 40,
       left: 40
     }
     , width = svgContainerWidth - margin.left - margin.right
     , barHeight = 20
     , height = barHeight * data.length;
-    
 
+  // Compute x range
   var x = d3.scale.linear()
     .domain([d3.min(data, function(d) {
-      d.costVariancePercentage = ((d.projectedActualCostMillions / d.plannedCostMillions) * 100) - 100;
       return d.costVariancePercentage;
     }), d3.max(data, function(d) {
-      // Calculate cost variance as a percentage
-      d.costVariancePercentage = ((d.projectedActualCostMillions / d.plannedCostMillions) * 100) - 100;
-      //console.log(d.key + ' ' + d.costVariancePercentage)
       return d.costVariancePercentage;
     })])
     .range([0, width]);
@@ -258,12 +259,22 @@ function drawBar(data) {
     
   var xAxis = d3.svg.axis()
     .scale(x)
-    .orient('bottom');
+    .orient('bottom')
+    .tickFormat(function(d) {
+      var sign = d > 0 ? '+' : d < 0 ? '-' : ''; 
+      return sign + d + '%';
+    });
     
   chart.append('g')
     .attr('class', 'x axis')
     .attr('transform', 'translate(0, ' + height + ')')
-    .call(xAxis);
+    .call(xAxis)
+    .append('text')
+      .attr('x', width / 2)
+      .attr('y', 30)
+      .style('text-anchor', 'middle')
+      .text('Percentage');
+      
 
   var g = chart.selectAll('.bar').data(data).enter()
     .append('g')
@@ -274,7 +285,18 @@ function drawBar(data) {
   g.append('rect')
     .attr('class', 'bar')
     .attr('width', function(d) {
-      return x(d.costVariancePercentage);
+      // If positive, start from 0
+      if (d.costVariancePercentage > 0) {
+        return x(d.costVariancePercentage) - x(0);
+      } else {
+        return x(d.costVariancePercentage);
+      }
+    })
+    .attr('x', function(d) {
+      // If positive, shift to start at 0
+      if (d.costVariancePercentage > 0) {
+        return x(0);
+      }
     })
     .attr('height', barHeight - 1);
 
