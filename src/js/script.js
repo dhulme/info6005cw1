@@ -235,11 +235,11 @@ function drawBar(data) {
     , margin = {
       top: 20,
       right: 30,
-      bottom: 40,
+      bottom: 50,
       left: 40
     }
     , width = svgContainerWidth - margin.left - margin.right
-    , barHeight = 20
+    , barHeight = 25
     , height = barHeight * data.length;
 
   // Compute x range
@@ -271,7 +271,7 @@ function drawBar(data) {
     .call(xAxis)
     .append('text')
       .attr('x', width / 2)
-      .attr('y', 30)
+      .attr('y', margin.bottom - 10)
       .style('text-anchor', 'middle')
       .text('Percentage');
       
