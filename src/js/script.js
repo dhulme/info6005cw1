@@ -16,7 +16,7 @@ $(function() {
     
     // Bar
     drawBar(processedData);
-    
+    attachBarEvents();
   });
 });
 
@@ -294,7 +294,12 @@ function drawBar(data) {
         return x(0);
       }
     })
-    .attr('height', barHeight - 1);
+    .attr('height', barHeight - 1)
+    .attr('data-tooltip-content', function(d) {
+      // Using http://stackoverflow.com/questions/11832914/round-up-to-2-decimal-places-in-javascript
+      var variance2DP = Math.round((Number(d.costVariancePercentage) + 0.00001) * 100) / 100;
+      return d.key + ' (' + getPercentageString(variance2DP) + ')'; 
+    });
 
   g.append('text')
     .attr('class', 'bar-overlay')
@@ -314,6 +319,21 @@ function drawBar(data) {
       if (self.width() < x(d.costVariancePercentage)) {
         self.show();
       }
+    });
+}
+
+function attachBarEvents() {
+  var tooltip = $('#tooltip');
+  $('#barSvg rect')
+    .mouseover(function(e) {
+      tooltip
+        .show()
+        .css('left', e.clientX + 10)
+        .css('top', e.clientY - 10)
+        .find('.content').html($(this).data('tooltipContent'));
+    })
+    .mouseleave(function(e) {
+      tooltip.hide();
     });
 }
 
@@ -373,7 +393,7 @@ function attachGlobalEvents() {
 }
 
 function getPercentageString(percentage) {
-  var sign = percentage > 0 ? '+' : percentage < 0 ? '-' : ''; 
+  var sign = percentage > 0 ? '+' : ''; 
   return sign + percentage + '%';
 }
 
