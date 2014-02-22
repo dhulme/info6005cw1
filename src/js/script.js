@@ -270,7 +270,7 @@ function drawBar(data) {
       .attr('x', width / 2)
       .attr('y', margin.bottom - 10)
       .style('text-anchor', 'middle')
-      .text('Percentage');
+      .text('Percentage of department budget spent');
 
   var g = chart.selectAll('.bar').data(data).enter()
     .append('g')
@@ -280,18 +280,13 @@ function drawBar(data) {
     
   g.append('rect')
     .attr('class', 'bar')
-    .attr('width', function(d) {
-      // If positive, start from 0
-      if (d.costVariancePercentage > 0) {
-        return x(d.costVariancePercentage) - x(0);
-      } else {
-        return x(d.costVariancePercentage);
-      }
-    })
+    .attr('width',0)
     .attr('x', function(d) {
       // If positive, shift to start at 0
       if (d.costVariancePercentage > 0) {
         return x(0);
+      } else {
+        return x(0) - x(d.costVariancePercentage);
       }
     })
     .attr('height', barHeight - 1)
@@ -299,7 +294,17 @@ function drawBar(data) {
       // Using http://stackoverflow.com/questions/11832914/round-up-to-2-decimal-places-in-javascript
       var variance2DP = Math.round((Number(d.costVariancePercentage) + 0.00001) * 100) / 100;
       return d.key + ' (' + getPercentageString(variance2DP) + ')'; 
-    });
+    })
+    .transition()
+      .duration(500)
+      .attr('width', function(d) {
+        // If positive, start from 0
+        if (d.costVariancePercentage > 0) {
+          return x(d.costVariancePercentage) - x(0);
+        } else {
+          return x(d.costVariancePercentage);
+        }
+      });
 
   g.append('text')
     .attr('class', 'bar-overlay')
