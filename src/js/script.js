@@ -260,10 +260,7 @@ function drawBar(data) {
   var xAxis = d3.svg.axis()
     .scale(x)
     .orient('bottom')
-    .tickFormat(function(d) {
-      var sign = d > 0 ? '+' : d < 0 ? '-' : ''; 
-      return sign + d + '%';
-    });
+    .tickFormat(getPercentageString);
     
   chart.append('g')
     .attr('class', 'x axis')
@@ -274,7 +271,6 @@ function drawBar(data) {
       .attr('y', margin.bottom - 10)
       .style('text-anchor', 'middle')
       .text('Percentage');
-      
 
   var g = chart.selectAll('.bar').data(data).enter()
     .append('g')
@@ -301,6 +297,7 @@ function drawBar(data) {
     .attr('height', barHeight - 1);
 
   g.append('text')
+    .attr('class', 'bar-overlay')
     .attr('x', function(d) {
       return x(d.costVariancePercentage) - 3;
     })
@@ -309,8 +306,14 @@ function drawBar(data) {
     .text(function(d) { 
       // Using http://stackoverflow.com/questions/11832914/round-up-to-2-decimal-places-in-javascript
       var variance2DP = Math.round((Number(d.costVariancePercentage) + 0.00001) * 100) / 100;
-
-      return d.key + ' (' + variance2DP + '%)'; 
+      return d.key + ' (' + getPercentageString(variance2DP) + ')'; 
+    })
+    .each(function(d) {
+      // Show label if it's smaller than the bar size
+      var self = $(this);
+      if (self.width() < x(d.costVariancePercentage)) {
+        self.show();
+      }
     });
 }
 
@@ -367,6 +370,11 @@ function attachGlobalEvents() {
     var hashId = window.location.hash.split('#')[1];
     $('a[data-visualisation-id="' + hashId + '"]').click();
   }
+}
+
+function getPercentageString(percentage) {
+  var sign = percentage > 0 ? '+' : percentage < 0 ? '-' : ''; 
+  return sign + percentage + '%';
 }
 
 // From http://stackoverflow.com/questions/9063383/how-to-invoke-click-event-programmaticaly-in-d3
