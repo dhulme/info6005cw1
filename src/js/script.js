@@ -4,19 +4,11 @@ $(function() {
   loadDataset(function(err, data) {
     if (err) console.error(err);
     
+    var processedData = processData(data);
+    
     // Initialize global UI
     $(document).foundation();
-    attachGlobalEvents();
-    
-    processedData = processData(data);
-    
-    // Sunburst
-    drawSunburst(processedData);
-    attachSunburstEvents();
-    
-    // Bar
-    drawBar(processedData);
-    attachBarEvents();
+    attachGlobalEvents(processedData);
   });
 });
 
@@ -381,14 +373,29 @@ function loadDataset(done) {
   d3.csv(DATASET_SRC, type, done);
 }
 
-function attachGlobalEvents() {
+function attachGlobalEvents(processedData) {
   $('#visList a').click(function() {
     var self = $(this);
     $('#visList').find('li').removeClass('active');
     self.parent().addClass('active');
 
     $('section.content').hide();
-    $('#' + self.data('visualisationId')).show();
+    
+    var visualisationId = self.data('visualisationId');
+    $('#' + visualisationId).show();
+    switch (visualisationId) {
+      case 'visualisation1':
+        // Sunburst
+        drawSunburst(processedData);
+        attachSunburstEvents();
+        break;
+      case 'visualisation2':
+        // Bar
+        drawBar(processedData);
+        attachBarEvents();
+        break;
+    }
+    
   });
   
   if (window.location.hash) {
