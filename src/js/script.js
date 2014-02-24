@@ -225,6 +225,32 @@ function drawBar(data, mode) {
     d.costVarianceMillions = d.projectedActualCostMillions - d.plannedCostMillions;
   });
   
+  // Compute data attribute
+  var dataAttr;
+  switch (mode) {
+    case 'percentage':
+      dataAttr = 'costVariancePercentage';
+      break;
+    case 'millions':
+      dataAttr = 'costVarianceMillions';
+      break;
+  }
+  
+  function generateBarText(d) {
+    // Using http://stackoverflow.com/questions/11832914/round-up-to-2-decimal-places-in-javascript
+    var variance2DP = Math.round((Number(d[dataAttr]) + 0.00001) * 100) / 100;
+    return d.key + ' (' + generateNumberString(variance2DP) + ')';
+  }
+  
+  function generateNumberString(d) {
+    var sign = d > 0 ? '+' : ''; 
+    if (mode === 'percentage') {
+      return sign + d + '%';
+    } else {
+      return sign + d + '$M';
+    }
+  }
+  
   var svgContainerWidth = $('#barSvg').parents('.svg-container').width()
     , margin = {
       top: 20,
@@ -239,9 +265,9 @@ function drawBar(data, mode) {
   // Compute x range
   var x = d3.scale.linear()
     .domain([d3.min(data, function(d) {
-      return d[mode];
+      return d[dataAttr];
     }), d3.max(data, function(d) {
-      return d[mode];
+      return d[dataAttr];
     })])
     .range([0, width]);
 
@@ -254,7 +280,7 @@ function drawBar(data, mode) {
   var xAxis = d3.svg.axis()
     .scale(x)
     .orient('bottom')
-    .tickFormat(getPercentageString);
+    .tickFormat(generateNumberString);
     
   chart.append('g')
     .attr('class', 'x axis')
@@ -277,45 +303,37 @@ function drawBar(data, mode) {
     .attr('width',0)
     .attr('x', function(d) {
       // If positive, shift to start at 0
-      if (d[mode] > 0) {
+      if (d[dataAttr] > 0) {
         return x(0);
       } else {
-        return x(0) - x(d[mode]);
+        return x(0) - x(d[dataAttr]);
       }
     })
     .attr('height', barHeight - 1)
-    .attr('data-tooltip-content', function(d) {
-      // Using http://stackoverflow.com/questions/11832914/round-up-to-2-decimal-places-in-javascript
-      var variance2DP = Math.round((Number(d[mode]) + 0.00001) * 100) / 100;
-      return d.key + ' (' + getPercentageString(variance2DP) + ')'; 
-    })
+    .attr('data-tooltip-content', generateBarText)
     .transition()
       .duration(500)
       .attr('width', function(d) {
         // If positive, start from 0
-        if (d[mode] > 0) {
-          return x(d[mode]) - x(0);
+        if (d[dataAttr] > 0) {
+          return x(d[dataAttr]) - x(0);
         } else {
-          return x(d[mode]);
+          return x(d[dataAttr]);
         }
       });
 
   g.append('text')
     .attr('class', 'bar-overlay')
     .attr('x', function(d) {
-      return x(d.costVariancePercentage) - 3;
+      return x(d[dataAttr]) - 3;
     })
     .attr('y', barHeight / 2)
     .attr('dy', '.35em')
-    .text(function(d) { 
-      // Using http://stackoverflow.com/questions/11832914/round-up-to-2-decimal-places-in-javascript
-      var variance2DP = Math.round((Number(d.costVariancePercentage) + 0.00001) * 100) / 100;
-      return d.key + ' (' + getPercentageString(variance2DP) + ')'; 
-    })
+    .text(generateBarText)
     .each(function(d) {
       // Show label if it's smaller than the bar size
       var self = $(this);
-      if (self.width() < x(d.costVariancePercentage)) {
+      if (self.width() < x(d[dataAttr])) {
         self.show();
       }
     });
@@ -339,10 +357,10 @@ function attachBarEvents(data) {
     var mode;
     switch (this.id) {
       case 'percentageVarianceRadio':
-        mode = 'costVariancePercentage';
+        mode = 'percentage';
         break;
       case 'millionsVarianceRadio':
-        mode = 'costVarianceMillions';
+        mode = 'millions';
         break;
     }
     
@@ -408,7 +426,7 @@ function attachGlobalEvents(processedData) {
       case 'visualisation2':
         // Bar
         var barData = processedData.values;
-        drawBar(barData, 'costVariancePercentage');
+        drawBar(barData, 'percentage');
         attachBarEvents(barData);
         break;
     }
@@ -421,10 +439,6 @@ function attachGlobalEvents(processedData) {
   }
 }
 
-function getPercentageString(percentage) {
-  var sign = percentage > 0 ? '+' : ''; 
-  return sign + percentage + '%';
-}
 
 // From http://stackoverflow.com/questions/9063383/how-to-invoke-click-event-programmaticaly-in-d3
 jQuery.fn.d3Click = function () {
