@@ -59,6 +59,12 @@ function processData(data) {
   
   scanNode(tree);
   
+  // Compute cost variance for top layer
+  tree.values.forEach(function(d) {
+    d.costVariancePercentage = ((d.projectedActualCostMillions / d.plannedCostMillions) * 100) - 100;
+    d.costVarianceMillions = d.projectedActualCostMillions - d.plannedCostMillions;
+  });
+  
   return tree;
 }
 
@@ -219,15 +225,8 @@ function drawBar(data, percentageMode) {
   // Remove all child elements that may exist
   $('#barSvg').empty();
   
-  // Compute costVariancePercentage
-  data.forEach(function(d) {
-    d.costVariancePercentage = ((d.projectedActualCostMillions / d.plannedCostMillions) * 100) - 100;
-    d.costVarianceMillions = d.projectedActualCostMillions - d.plannedCostMillions;
-  });
-  
   // Compute data attribute
   var dataAttr = percentageMode ? 'costVariancePercentage' : 'costVarianceMillions';
-  
   
   function generateBarText(d) {
     // Using http://stackoverflow.com/questions/11832914/round-up-to-2-decimal-places-in-javascript
@@ -253,6 +252,7 @@ function drawBar(data, percentageMode) {
     , barHeight = 25
     , height = barHeight * data.length;
 
+  pubData = data
   // Compute x range
   var x = d3.scale.linear()
     .domain([d3.min(data, function(d) {
@@ -261,6 +261,8 @@ function drawBar(data, percentageMode) {
       return d[dataAttr];
     })])
     .range([0, width]);
+
+  xscale = x
 
   var chart = d3.select('#barSvg')
     .attr('width', width + margin.left + margin.right)
@@ -301,7 +303,7 @@ function drawBar(data, percentageMode) {
       if (d[dataAttr] > 0) {
         return x(0);
       } else {
-        return x(0) - x(d[dataAttr]);
+        return x(d[dataAttr]);
       }
     })
     .attr('height', barHeight - 1)
@@ -309,11 +311,10 @@ function drawBar(data, percentageMode) {
     .transition()
       .duration(500)
       .attr('width', function(d) {
-        // If positive, start from 0
         if (d[dataAttr] > 0) {
-          return x(d[dataAttr]) - x(0);
-        } else {
           return x(d[dataAttr]);
+        } else {
+          return x(0) - x(d[dataAttr]);
         }
       });
 
@@ -336,7 +337,7 @@ function drawBar(data, percentageMode) {
 
 function attachBarEvents(data) {
   var tooltip = $('#tooltip');
-  $('#barSvg rect')
+  $('#barSvg .bar, .bar-overlay')
     .mouseover(function(e) {
       tooltip
         .show()
@@ -350,6 +351,7 @@ function attachBarEvents(data) {
     
   $('#barControls input').change(function(e) {
     drawBar(data, (this.id === 'percentageVarianceRadio'));
+    attachBarEvents(data);
   });
 }
 
@@ -411,7 +413,7 @@ function attachGlobalEvents(processedData) {
       case 'visualisation2':
         // Bar
         var barData = processedData.values;
-        drawBar(barData, true);
+        drawBar(barData, false);
         attachBarEvents(barData);
         break;
     }
