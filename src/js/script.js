@@ -215,7 +215,7 @@ function attachSunburstEvents() {
 }
 
 // Functioned modified from http://bost.ocks.org/mike/bar/2/
-function drawBar(data, mode) {
+function drawBar(data, percentageMode) {
   // Remove all child elements that may exist
   $('#barSvg').empty();
   
@@ -226,15 +226,8 @@ function drawBar(data, mode) {
   });
   
   // Compute data attribute
-  var dataAttr;
-  switch (mode) {
-    case 'percentage':
-      dataAttr = 'costVariancePercentage';
-      break;
-    case 'millions':
-      dataAttr = 'costVarianceMillions';
-      break;
-  }
+  var dataAttr = percentageMode ? 'costVariancePercentage' : 'costVarianceMillions';
+  
   
   function generateBarText(d) {
     // Using http://stackoverflow.com/questions/11832914/round-up-to-2-decimal-places-in-javascript
@@ -243,12 +236,10 @@ function drawBar(data, mode) {
   }
   
   function generateNumberString(d) {
-    var sign = d > 0 ? '+' : ''; 
-    if (mode === 'percentage') {
-      return sign + d + '%';
-    } else {
-      return sign + d + '$M';
-    }
+    var sign = d > 0 ? '+' : ''
+      , unit = percentageMode ? '%' : ' $M';
+      
+    return sign + d + unit;
   }
   
   var svgContainerWidth = $('#barSvg').parents('.svg-container').width()
@@ -290,7 +281,11 @@ function drawBar(data, mode) {
       .attr('x', width / 2)
       .attr('y', margin.bottom - 10)
       .style('text-anchor', 'middle')
-      .text('Percentage of department budget spent');
+      .text(function() {
+        return percentageMode
+          ? 'Percentage of department budget spent'
+          : 'Deparment budget spend';
+      });
 
   var g = chart.selectAll('.bar').data(data).enter()
     .append('g')
@@ -354,17 +349,7 @@ function attachBarEvents(data) {
     });
     
   $('#barControls input').change(function(e) {
-    var mode;
-    switch (this.id) {
-      case 'percentageVarianceRadio':
-        mode = 'percentage';
-        break;
-      case 'millionsVarianceRadio':
-        mode = 'millions';
-        break;
-    }
-    
-    drawBar(data, mode);
+    drawBar(data, (this.id === 'percentageVarianceRadio'));
   });
 }
 
@@ -426,7 +411,7 @@ function attachGlobalEvents(processedData) {
       case 'visualisation2':
         // Bar
         var barData = processedData.values;
-        drawBar(barData, 'percentage');
+        drawBar(barData, true);
         attachBarEvents(barData);
         break;
     }
