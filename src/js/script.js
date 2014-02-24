@@ -215,12 +215,14 @@ function attachSunburstEvents() {
 }
 
 // Functioned modified from http://bost.ocks.org/mike/bar/2/
-function drawBar(data) {
-  data = data.children;
+function drawBar(data, mode) {
+  // Remove all child elements that may exist
+  $('#barSvg').empty();
   
   // Compute costVariancePercentage
   data.forEach(function(d) {
     d.costVariancePercentage = ((d.projectedActualCostMillions / d.plannedCostMillions) * 100) - 100;
+    d.costVarianceMillions = d.projectedActualCostMillions - d.plannedCostMillions;
   });
   
   var svgContainerWidth = $('#barSvg').parents('.svg-container').width()
@@ -237,9 +239,9 @@ function drawBar(data) {
   // Compute x range
   var x = d3.scale.linear()
     .domain([d3.min(data, function(d) {
-      return d.costVariancePercentage;
+      return d[mode];
     }), d3.max(data, function(d) {
-      return d.costVariancePercentage;
+      return d[mode];
     })])
     .range([0, width]);
 
@@ -275,26 +277,26 @@ function drawBar(data) {
     .attr('width',0)
     .attr('x', function(d) {
       // If positive, shift to start at 0
-      if (d.costVariancePercentage > 0) {
+      if (d[mode] > 0) {
         return x(0);
       } else {
-        return x(0) - x(d.costVariancePercentage);
+        return x(0) - x(d[mode]);
       }
     })
     .attr('height', barHeight - 1)
     .attr('data-tooltip-content', function(d) {
       // Using http://stackoverflow.com/questions/11832914/round-up-to-2-decimal-places-in-javascript
-      var variance2DP = Math.round((Number(d.costVariancePercentage) + 0.00001) * 100) / 100;
+      var variance2DP = Math.round((Number(d[mode]) + 0.00001) * 100) / 100;
       return d.key + ' (' + getPercentageString(variance2DP) + ')'; 
     })
     .transition()
       .duration(500)
       .attr('width', function(d) {
         // If positive, start from 0
-        if (d.costVariancePercentage > 0) {
-          return x(d.costVariancePercentage) - x(0);
+        if (d[mode] > 0) {
+          return x(d[mode]) - x(0);
         } else {
-          return x(d.costVariancePercentage);
+          return x(d[mode]);
         }
       });
 
@@ -319,7 +321,7 @@ function drawBar(data) {
     });
 }
 
-function attachBarEvents() {
+function attachBarEvents(data) {
   var tooltip = $('#tooltip');
   $('#barSvg rect')
     .mouseover(function(e) {
@@ -332,6 +334,20 @@ function attachBarEvents() {
     .mouseleave(function(e) {
       tooltip.hide();
     });
+    
+  $('#barControls input').change(function(e) {
+    var mode;
+    switch (this.id) {
+      case 'percentageVarianceRadio':
+        mode = 'costVariancePercentage';
+        break;
+      case 'millionsVarianceRadio':
+        mode = 'costVarianceMillions';
+        break;
+    }
+    
+    drawBar(data, mode);
+  });
 }
 
 function loadDataset(done) {
@@ -391,8 +407,9 @@ function attachGlobalEvents(processedData) {
         break;
       case 'visualisation2':
         // Bar
-        drawBar(processedData);
-        attachBarEvents();
+        var barData = processedData.values;
+        drawBar(barData, 'costVariancePercentage');
+        attachBarEvents(barData);
         break;
     }
     

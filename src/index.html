@@ -55,8 +55,22 @@
     
     <section id="visualisation2" class="content">
       <div class="row">
-        <div class="small-12 column svg-container">
+        <div class="small-8 column svg-container">
           <svg id="barSvg"></svg>
+        </div>
+        <div class="small-4 column">
+          <div class="panel">
+            <h5>US Spending Variance</h5>
+            <p>Blah blah blah</p>
+            
+            <form id="barControls">
+              <input type="radio" name="spendingRadios" id="percentageVarianceRadio" checked>
+              <label for="percentageVarianceRadio">Percentage</label>
+              
+              <input type="radio" name="spendingRadios" id="millionsVarianceRadio">
+              <label for="millionsVarianceRadio">Millions $</label>
+            </form>
+          </div>
         </div>
       </div>
     </section>
