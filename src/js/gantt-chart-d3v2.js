@@ -10,10 +10,10 @@ d3.gantt = function() {
   var FIXED_TIME_DOMAIN_MODE = "fixed";
 
   var margin = {
-    top : 20,
-    right : 40,
-    bottom : 20,
-    left : 150
+    top: 0,
+    right: 0,
+    bottom: 40,
+    left: 100
   };
   
   var timeDomainStart = d3.time.day.offset(new Date(),-3);
@@ -21,17 +21,18 @@ d3.gantt = function() {
   var timeDomainMode = FIT_TIME_DOMAIN_MODE;// fixed or fit
   var taskTypes = [];
   var taskStatus = [];
-  var height = document.body.clientHeight - margin.top - margin.bottom-5;
-  var width = document.body.clientWidth - margin.right - margin.left-5;
+  var height = 350;
+  var width = $('#ganttSvg').parents('.svg-container').width();
+  console.log(width)
 
   var tickFormat = "%H:%M";
 
   var keyFunction = function(d) {
-    return d.startDate + d.taskName + d.endDate;
+    return d.startDate + d.projectName + d.endDate;
   };
 
   var rectTransform = function(d) {
-    return "translate(" + x(d.startDate) + "," + y(d.taskName) + ")";
+    return "translate(" + x(d.startDate) + "," + y(d.projectName) + ")";
   };
 
   var x = d3.time.scale().domain([ timeDomainStart, timeDomainEnd ]).range([ 0, width ]).clamp(true);
@@ -62,7 +63,7 @@ d3.gantt = function() {
   };
 
   var initAxis = function() {
-    x = d3.time.scale().domain([ timeDomainStart, timeDomainEnd ]).range([ 0, width ]).clamp(true);
+    x = d3.time.scale().domain([ timeDomainStart, timeDomainEnd ]).range([ 0, width - margin.left - margin.right ]).clamp(true);
     y = d3.scale.ordinal().domain(taskTypes).rangeRoundBands([ 0, height - margin.top - margin.bottom ], .1);
     xAxis = d3.svg.axis().scale(x).orient("bottom").tickFormat(d3.time.format(tickFormat)).tickSubdivide(true)
       .tickSize(8).tickPadding(8);
@@ -80,7 +81,7 @@ d3.gantt = function() {
       .attr("width", width + margin.left + margin.right)
       .attr("height", height + margin.top + margin.bottom)
       .append("g")
-            .attr("class", "gantt-chart")
+        .attr("class", "gantt-chart")
       .attr("width", width + margin.left + margin.right)
       .attr("height", height + margin.top + margin.bottom)
       .attr("transform", "translate(" + margin.left + ", " + margin.top + ")");
@@ -111,7 +112,6 @@ d3.gantt = function() {
     svg.append("g").attr("class", "y axis").transition().call(yAxis);
 
     return gantt;
-
   };
     
   gantt.redraw = function(tasks) {

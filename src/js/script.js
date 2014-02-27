@@ -347,20 +347,26 @@ function drawGantt(tasks) {
       "KILLED" : "bar-killed"
   };
 
-  var taskNames = [ "D Job", "P Job", "E Job", "A Job", "N Job" ];
+  var taskNames = tasks.map(function(d) {
+    return d.projectName;
+  });
 
   tasks.sort(function(a, b) {
-      return a.endDate - b.endDate;
+    return a.endDate - b.endDate;
   });
   var maxDate = tasks[tasks.length - 1].endDate;
   tasks.sort(function(a, b) {
-      return a.startDate - b.startDate;
+    return a.startDate - b.startDate;
   });
   var minDate = tasks[0].startDate;
 
-  var format = "%H:%M";
+  var format = "%b '%y";
 
-  var gantt = d3.gantt().taskTypes(taskNames).taskStatus(taskStatus).tickFormat(format);
+  var gantt = d3.gantt()
+    .taskTypes(taskNames)
+    .taskStatus(taskStatus)
+    .tickFormat(format);
+    
   gantt(tasks);
 }
 
