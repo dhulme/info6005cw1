@@ -1,11 +1,11 @@
 var DATASET_SRC = 'dataset-edited.csv';
 
 $(function() {
-  loadDataset(function(err, data) {
+  loadDataset(function(err, rawData) {
     if (err) console.error(err);
     
-    var processedData = processData(data);
-    
+    var processedData = processData(rawData);
+    console.log(processedData)
     // Initialize global UI
     $(document).foundation();
     attachGlobalEvents(processedData);
@@ -27,7 +27,9 @@ function processData(data) {
           projectName: leaves[leaf].projectName,
           projectedActualCostMillions: leaves[leaf].projectedActualCostMillions,
           plannedCostMillions: leaves[leaf].plannedCostMillions,
-          costVarianceMillions: leaves[leaf].costVarianceMillions
+          costVarianceMillions: leaves[leaf].costVarianceMillions,
+          startDate: leaves[leaf].startDate,
+          completionDate: leaves[leaf].completionDate
         };
       }
       return leaves;
@@ -35,7 +37,7 @@ function processData(data) {
     .entries(data);
     
   var tree = {
-    key: 'US Department Spending',
+    key: 'United States',
     values: nest
   };
 
@@ -121,7 +123,7 @@ function drawSunburst(root) {
         if (!d.depth) {
           return '#fff';
         } else {
-          return color((d.children ? d : d.parent).key);
+          return color(d.children ? d.key : d.projectName);
         }
       })
       .style('fill-rule', 'evenodd')
@@ -355,6 +357,39 @@ function attachBarEvents(data) {
   });
 }
 
+function attachGanttEvents(data) {
+  var departmentSelect = $('#departmentSelect')
+    , investmentSelect = $('#investmentSelect');
+  
+  // Set up department combo values
+  var departmentSelectHTML = '';
+  data.values.forEach(function(department, index) {
+    departmentSelectHTML += '<option data-index="' + index + '">' + department.key + '</option>';
+  });
+  departmentSelect.html(departmentSelectHTML);
+  
+  var updateInvestmentList = function(values) {
+    // And for investment combo (with default option)
+    var investmentSelectHTML = '';
+    values.forEach(function(investment) {
+      investmentSelectHTML += '<option>' + investment.key +'</option>';
+    });
+    investmentSelect.html(investmentSelectHTML);
+  };
+  
+  // Set up listeners
+  // On department change, update investments
+  departmentSelect.change(function(e) {
+    var selected = $(this).find(':selected')
+      , index = Number(selected.data('index'));
+      
+    updateInvestmentList(data.values[index].values);
+  });
+  
+  // Set default investment values
+  updateInvestmentList(data.values[0].values);
+}
+
 function loadDataset(done) {
   function type(data) {
     var obj = {
@@ -416,14 +451,19 @@ function attachGlobalEvents(processedData) {
         drawBar(barData, false);
         attachBarEvents(barData);
         break;
+      case 'visualisation3':
+        attachGanttEvents(processedData);
+        break;
     }
     
   });
   
-  if (window.location.hash) {
-    var hashId = window.location.hash.split('#')[1];
-    $('a[data-visualisation-id="' + hashId + '"]').click();
+  if (!window.location.hash) {
+    window.location.hash = '#visualisation1';
   }
+  
+  var hashId = window.location.hash.split('#')[1];
+  $('a[data-visualisation-id="' + hashId + '"]').click();
 }
 
 

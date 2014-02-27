@@ -18,7 +18,7 @@ section.content {
   display: block;
 }
 
-#visualisation2 {
+#visualisation2, #visualisation3 {
   display: none;
 }
 

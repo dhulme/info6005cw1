@@ -24,6 +24,7 @@
         <ul class="left" id="visList">
           <li class="active"><a href="#visualisation1" data-visualisation-id="visualisation1">Visualisation 1</a></li>
           <li><a href="#visualisation2" data-visualisation-id="visualisation2">Visualisation 2</a></li>
+          <li><a href="#visualisation3" data-visualisation-id="visualisation3">Visualisation 3</a></li>
         </ul>
       </section>
     </nav>
@@ -69,6 +70,31 @@
               
               <input type="radio" name="spendingRadios" id="millionsVarianceRadio">
               <label for="millionsVarianceRadio">Millions $</label>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <section id="visualisation3" class="content">
+      <div class="row">
+        <div class="small-8 column svg-container">
+          <svg id="ganttSvg"></svg>
+        </div>
+        <div class="small-4 column">
+          <div class="panel">
+            <h5>US Spending Variance</h5>
+            <p>Blah blah blah</p>
+            
+            <form id="ganttControls">
+              <label for="departmentSelect">Department</label>
+              <select id="departmentSelect">
+              </select>
+              
+              <label for="investmentSelect">Investment</label>
+              <select id="investmentSelect">
+                
+              </select>
             </form>
           </div>
         </div>
