@@ -16,14 +16,13 @@ d3.gantt = function() {
     left: 100
   };
   
-  var timeDomainStart = d3.time.day.offset(new Date(),-3);
-  var timeDomainEnd = d3.time.hour.offset(new Date(),+3);
-  var timeDomainMode = FIT_TIME_DOMAIN_MODE;// fixed or fit
+  var timeDomainStart
+    , timeDomainEnd;
+    
   var taskTypes = [];
   var taskStatus = [];
   var height = 350;
   var width = $('#ganttSvg').parents('.svg-container').width();
-  console.log(width)
 
   var tickFormat = "%H:%M";
 
@@ -35,40 +34,60 @@ d3.gantt = function() {
     return "translate(" + x(d.startDate) + "," + y(d.projectName) + ")";
   };
 
-  var x = d3.time.scale().domain([ timeDomainStart, timeDomainEnd ]).range([ 0, width ]).clamp(true);
-
-  var y = d3.scale.ordinal().domain(taskTypes).rangeRoundBands([ 0, height - margin.top - margin.bottom ], .1);
-
-  var xAxis = d3.svg.axis().scale(x).orient("bottom").tickFormat(d3.time.format(tickFormat)).tickSubdivide(true)
-    .tickSize(8).tickPadding(8);
-
-  var yAxis = d3.svg.axis().scale(y).orient("left").tickSize(0);
+  var x = d3.time.scale();
+  var y = d3.scale.ordinal();
+  var xAxis = d3.svg.axis();
+  var yAxis = d3.svg.axis();
 
   var initTimeDomain = function(tasks) {
-    if (timeDomainMode === FIT_TIME_DOMAIN_MODE) {
-      if (tasks === undefined || tasks.length < 1) {
-        timeDomainStart = d3.time.day.offset(new Date(), -3);
-        timeDomainEnd = d3.time.hour.offset(new Date(), +3);
-        return;
-      }
-      tasks.sort(function(a, b) {
-        return a.endDate - b.endDate;
-      });
-      timeDomainEnd = tasks[tasks.length - 1].endDate;
-      tasks.sort(function(a, b) {
-        return a.startDate - b.startDate;
-      });
-      timeDomainStart = tasks[0].startDate;
+    var startDates = tasks.map(function(d) {
+      return d.startDate;
+    });
+    var endDates = tasks.map(function(d) {
+      return d.endDate;
+    });
+    
+    timeDomainStart = d3.min(startDates);
+    timeDomainEnd = d3.max(endDates);
+  };
+  
+  var getBarFill = function(d, index) {
+    switch (index) {
+      case 0:
+        return '33b5e5';
+      case 1:
+        return '669900';
+      case 2:
+        return 'ffbb33';
+      case 3:
+        return 'ffbb33';
+      case 4:
+        return 'CC0000';
     }
   };
 
   var initAxis = function() {
-    x = d3.time.scale().domain([ timeDomainStart, timeDomainEnd ]).range([ 0, width - margin.left - margin.right ]).clamp(true);
-    y = d3.scale.ordinal().domain(taskTypes).rangeRoundBands([ 0, height - margin.top - margin.bottom ], .1);
-    xAxis = d3.svg.axis().scale(x).orient("bottom").tickFormat(d3.time.format(tickFormat)).tickSubdivide(true)
-      .tickSize(8).tickPadding(8);
+    x = d3.time.scale()
+      .domain([ timeDomainStart, timeDomainEnd ])
+      .range([ 0, width - margin.left - margin.right ])
+      .clamp(true);
+      
+    y = d3.scale.ordinal()
+      .domain(taskTypes)
+      .rangeRoundBands([ 0, height - margin.top - margin.bottom ], .1);
+      
+    xAxis = d3.svg.axis()
+      .scale(x)
+      .orient("bottom")
+      .tickFormat(d3.time.format(tickFormat))
+      .tickSubdivide(true)
+      .tickSize(8)
+      .tickPadding(8);
 
-    yAxis = d3.svg.axis().scale(y).orient("left").tickSize(0);
+    yAxis = d3.svg.axis()
+      .scale(y)
+      .orient("left")
+      .tickSize(0);
   };
     
   function gantt(tasks) {
@@ -89,18 +108,15 @@ d3.gantt = function() {
     svg.selectAll('.gantt')
      .data(tasks, keyFunction).enter()
      .append("rect")
-     .attr("rx", 5)
-           .attr("ry", 5)
-     .attr("class", function(d){ 
-        if(taskStatus[d.status] == null){ return "bar";}
-        return taskStatus[d.status];
-      }) 
-     .attr("y", 0)
-     .attr("transform", rectTransform)
-     .attr("height", function(d) { return y.rangeBand(); })
-     .attr("width", function(d) { 
-        return (x(d.endDate) - x(d.startDate)); 
-      });
+      .attr("rx", 5)
+            .attr("ry", 5)
+      .style('fill', getBarFill)
+      .attr("y", 0)
+      .attr("transform", rectTransform)
+      .attr("height", function(d) { return y.rangeBand(); })
+      .attr("width", function(d) { 
+         return (x(d.endDate) - x(d.startDate)); 
+       });
 	 
 	 
     svg.append("g")

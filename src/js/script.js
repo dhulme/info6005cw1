@@ -5,7 +5,6 @@ $(function() {
     if (err) console.error(err);
     
     var processedData = processData(rawData);
-    console.log(rawData)
     // Initialize global UI
     $(document).foundation();
     attachGlobalEvents(processedData);
@@ -339,32 +338,16 @@ function drawBar(data, percentageMode) {
 }
 
 function drawGantt(tasks) {
-  console.log(tasks)
-  var taskStatus = {
-      "SUCCEEDED" : "bar",
-      "FAILED" : "bar-failed",
-      "RUNNING" : "bar-running",
-      "KILLED" : "bar-killed"
-  };
-
+  $('#ganttSvg').empty();
+  
   var taskNames = tasks.map(function(d) {
     return d.projectName;
   });
-
-  tasks.sort(function(a, b) {
-    return a.endDate - b.endDate;
-  });
-  var maxDate = tasks[tasks.length - 1].endDate;
-  tasks.sort(function(a, b) {
-    return a.startDate - b.startDate;
-  });
-  var minDate = tasks[0].startDate;
 
   var format = "%b '%y";
 
   var gantt = d3.gantt()
     .taskTypes(taskNames)
-    .taskStatus(taskStatus)
     .tickFormat(format);
     
   gantt(tasks);
@@ -413,14 +396,25 @@ function attachGanttEvents(data) {
   // Set up listeners
   // On department change, update investments
   departmentSelect.change(function() {
-    var selected = $(this).find(':selected')
-      , index = Number(selected.val());
+    var selected = departmentSelect.find(':selected')
+      , departmentIndex = Number(selected.val())
+      , investmentIndex = investmentSelect.find('option').first().val();
       
-    updateInvestmentList(data.values[index].values);
+    updateInvestmentList(data.values[departmentIndex].values);
+    drawGantt(data.values[departmentIndex].values[investmentIndex].values);
   });
   
-  // Set default investment values
+  investmentSelect.change(function() {
+    var selected = investmentSelect.find(':selected')
+      , departmentIndex = departmentSelect.find(':selected').val()
+      , investmentIndex = Number(selected.val());
+      
+    drawGantt(data.values[departmentIndex].values[investmentIndex].values);
+  });
+  
+  // Draw default gantt
   updateInvestmentList(data.values[0].values);
+  drawGantt(data.values[0].values[0].values);
 }
 
 function loadDataset(done) {
@@ -450,9 +444,14 @@ function loadDataset(done) {
     // Set start and completion dates
     var startDateSplit = data['Start Date'].split('/')
       , completionDateSplit = data['Completion Date (B1)'].split('/');
-      
-    obj.startDate = new Date(startDateSplit[2], startDateSplit[1], startDateSplit[0]);
-    obj.completionDate = new Date(completionDateSplit[2], completionDateSplit[1], completionDateSplit[0]);
+
+    // Note: Month is zero based in JS Date
+    obj.startDate = new Date(startDateSplit[2],
+      Number(startDateSplit[1])-1,
+      startDateSplit[0]);
+    obj.completionDate = new Date(completionDateSplit[2],
+      Number(completionDateSplit[1])-1, 
+      completionDateSplit[0]);
     
     // Set updated date and time
     obj.updated = new Date(data['Updated Date']);
@@ -490,8 +489,8 @@ function attachGlobalEvents(processedData) {
         attachBarEvents(barData);
         break;
       case 'visualisation3':
-        drawGantt(processedData.values[0].values[0].values)
-        //attachGanttEvents(processedData);
+        // Gantt
+        attachGanttEvents(processedData);
         break;
     }
     
