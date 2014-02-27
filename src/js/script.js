@@ -5,7 +5,7 @@ $(function() {
     if (err) console.error(err);
     
     var processedData = processData(rawData);
-    console.log(processedData)
+    console.log(rawData)
     // Initialize global UI
     $(document).foundation();
     attachGlobalEvents(processedData);
@@ -29,7 +29,8 @@ function processData(data) {
           plannedCostMillions: leaves[leaf].plannedCostMillions,
           costVarianceMillions: leaves[leaf].costVarianceMillions,
           startDate: leaves[leaf].startDate,
-          completionDate: leaves[leaf].completionDate
+          // Saying endDate so that it matches with the gantt plugin
+          endDate: leaves[leaf].completionDate
         };
       }
       return leaves;
@@ -337,6 +338,32 @@ function drawBar(data, percentageMode) {
     });
 }
 
+function drawGantt(tasks) {
+  console.log(tasks)
+  var taskStatus = {
+      "SUCCEEDED" : "bar",
+      "FAILED" : "bar-failed",
+      "RUNNING" : "bar-running",
+      "KILLED" : "bar-killed"
+  };
+
+  var taskNames = [ "D Job", "P Job", "E Job", "A Job", "N Job" ];
+
+  tasks.sort(function(a, b) {
+      return a.endDate - b.endDate;
+  });
+  var maxDate = tasks[tasks.length - 1].endDate;
+  tasks.sort(function(a, b) {
+      return a.startDate - b.startDate;
+  });
+  var minDate = tasks[0].startDate;
+
+  var format = "%H:%M";
+
+  var gantt = d3.gantt().taskTypes(taskNames).taskStatus(taskStatus).tickFormat(format);
+  gantt(tasks);
+}
+
 function attachBarEvents(data) {
   var tooltip = $('#tooltip');
   $('#barSvg .bar, .bar-overlay')
@@ -364,24 +391,24 @@ function attachGanttEvents(data) {
   // Set up department combo values
   var departmentSelectHTML = '';
   data.values.forEach(function(department, index) {
-    departmentSelectHTML += '<option data-index="' + index + '">' + department.key + '</option>';
+    departmentSelectHTML += '<option value="' + index + '">' + department.key + '</option>';
   });
   departmentSelect.html(departmentSelectHTML);
   
   var updateInvestmentList = function(values) {
     // And for investment combo (with default option)
     var investmentSelectHTML = '';
-    values.forEach(function(investment) {
-      investmentSelectHTML += '<option>' + investment.key +'</option>';
+    values.forEach(function(investment, index) {
+      investmentSelectHTML += '<option value="' + index + '">' + investment.key +'</option>';
     });
     investmentSelect.html(investmentSelectHTML);
   };
   
   // Set up listeners
   // On department change, update investments
-  departmentSelect.change(function(e) {
+  departmentSelect.change(function() {
     var selected = $(this).find(':selected')
-      , index = Number(selected.data('index'));
+      , index = Number(selected.val());
       
     updateInvestmentList(data.values[index].values);
   });
@@ -402,8 +429,6 @@ function loadDataset(done) {
       agencyProjectId: data['Agency Project ID'],
       projectName: data['Project Name'],
       projectDescription: data['Project Description'],
-      startDate: new Date(['Start Date']),
-      completionDate: new Date(['Completion Date (B1)']),
       plannedProjectCompletionDate: new Date(data['Planned Project Completion Date (B2)']),
       projectedProjectCompletionDate: new Date(data['Projected/Actual Project Completion Date (B2)']),
       lifecycleCostMillions: Number(data['Lifecycle Cost ($ M)']),
@@ -415,6 +440,13 @@ function loadDataset(done) {
       projectedActualCostMillions: Number(data['Projected/Actual Cost ($ M)']),
       uniqueProjectId: data['Unique Project ID']
     };
+    
+    // Set start and completion dates
+    var startDateSplit = data['Start Date'].split('/')
+      , completionDateSplit = data['Completion Date (B1)'].split('/');
+      
+    obj.startDate = new Date(startDateSplit[2], startDateSplit[1], startDateSplit[0]);
+    obj.completionDate = new Date(completionDateSplit[2], completionDateSplit[1], completionDateSplit[0]);
     
     // Set updated date and time
     obj.updated = new Date(data['Updated Date']);
@@ -452,7 +484,8 @@ function attachGlobalEvents(processedData) {
         attachBarEvents(barData);
         break;
       case 'visualisation3':
-        attachGanttEvents(processedData);
+        drawGantt(processedData.values[0].values[0].values)
+        //attachGanttEvents(processedData);
         break;
     }
     
