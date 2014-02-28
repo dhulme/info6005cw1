@@ -10,14 +10,13 @@ d3.gantt = function() {
     top: 10,
     right: 0,
     bottom: 20,
-    left: 100
+    left: 150
   };
   
   var timeDomainStart
     , timeDomainEnd;
     
   var taskTypes = [];
-  var taskStatus = [];
   var height = 350;
   var width = $('#ganttSvg').parents('.svg-container').width();
 
@@ -49,17 +48,11 @@ d3.gantt = function() {
   };
   
   var getBarFill = function(d, index) {
-    switch (index) {
-      case 0:
-        return '33b5e5';
-      case 1:
-        return '669900';
-      case 2:
-        return 'ffbb33';
-      case 3:
-        return 'ffbb33';
-      case 4:
-        return 'CC0000';
+    switch (index % 4) {
+      case 0: return '33b5e5';
+      case 1: return '669900';
+      case 2: return 'ffbb33';
+      case 3: return 'CC0000';
     }
   };
 
@@ -84,8 +77,17 @@ d3.gantt = function() {
     yAxis = d3.svg.axis()
       .scale(y)
       .orient('left')
-      .tickSize(0);
+      .tickSize(0)
+      .tickFormat(function(d) {
+        if (d.length > 23) {
+          return d;//d.substring(0, 21) + '\n...';
+        } else {
+          return d;
+        }
+      });
   };
+  
+  
     
   function gantt(tasks) {
 	
@@ -118,27 +120,27 @@ d3.gantt = function() {
       });
 	 
     svg.append('g')
+      .attr('class', 'y axis')
+      .transition()
+      .call(yAxis);
+      
+    svg.selectAll('.y.axis text').each(function() {
+      var self = $(this);
+      if (self.width() > margin.left) {
+        var name = self.text()
+          , spaceIndex = name.substring(0, name.length/2).lastIndexOf(' ')
+          , html = '<tspan>' + name.substring(0, spaceIndex) + '</tspan>'
+            + '<tspan dy="15" x="0">'
+            + name.substring(spaceIndex + 1) + '</tspan>';
+        self.html(html);
+      }
+    });
+      
+    svg.append('g')
       .attr('class', 'x axis')
       .attr('transform', 'translate(0, ' + (height - margin.top - margin.bottom) + ')')
       .transition()
       .call(xAxis);
-      
-    // Axis label
-//    svg.append('text')
-//        .attr('x', 100)
-//        .attr('y', 0)
-//        .attr('class', 'x-axis-label')
-//        .text(function() {
-//          var investmentName = tasks[0].parent.key
-//            , departmentName = tasks[0].parent.parent.key;
-//            
-//          return departmentName + ' - ' + investmentName;
-//        });
-
-    svg.append('g')
-      .attr('class', 'y axis')
-      .transition()
-      .call(yAxis);
 
     return gantt;
   };

@@ -51,3 +51,7 @@ section.content {
   text-anchor: middle;
   font-size: 12px;
 }
+
+#ganttSvg .tick text {
+  font-size: 12px;
+}
