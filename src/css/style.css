@@ -47,3 +47,7 @@ section.content {
   shape-rendering: crispEdges;
 }
 
+#ganttSvg .x-axis-label {
+  text-anchor: middle;
+  font-size: 12px;
+}

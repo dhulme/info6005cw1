@@ -254,7 +254,6 @@ function drawBar(data, percentageMode) {
     , barHeight = 25
     , height = barHeight * data.length;
 
-  pubData = data
   // Compute x range
   var x = d3.scale.linear()
     .domain([d3.min(data, function(d) {
@@ -263,8 +262,6 @@ function drawBar(data, percentageMode) {
       return d[dataAttr];
     })])
     .range([0, width]);
-
-  xscale = x
 
   var chart = d3.select('#barSvg')
     .attr('width', width + margin.left + margin.right)
@@ -337,22 +334,6 @@ function drawBar(data, percentageMode) {
     });
 }
 
-function drawGantt(tasks) {
-  $('#ganttSvg').empty();
-  
-  var taskNames = tasks.map(function(d) {
-    return d.projectName;
-  });
-
-  var format = "%b '%y";
-
-  var gantt = d3.gantt()
-    .taskTypes(taskNames)
-    .tickFormat(format);
-    
-  gantt(tasks);
-}
-
 function attachBarEvents(data) {
   var tooltip = $('#tooltip');
   $('#barSvg .bar, .bar-overlay')
@@ -371,6 +352,22 @@ function attachBarEvents(data) {
     drawBar(data, (this.id === 'percentageVarianceRadio'));
     attachBarEvents(data);
   });
+}
+
+function drawGantt(tasks) {
+  $('#ganttSvg').empty();
+  
+  var taskNames = tasks.map(function(d) {
+    return d.projectName;
+  });
+
+  var format = "%b '%y";
+
+  var gantt = d3.gantt()
+    .taskTypes(taskNames)
+    .tickFormat(format);
+    
+  gantt(tasks);
 }
 
 function attachGanttEvents(data) {
@@ -483,14 +480,14 @@ function attachGlobalEvents(processedData) {
         attachSunburstEvents();
         break;
       case 'visualisation2':
+        // Gantt
+        attachGanttEvents(processedData);
+        break;
+      case 'visualisation3':
         // Bar
         var barData = processedData.values;
         drawBar(barData, false);
         attachBarEvents(barData);
-        break;
-      case 'visualisation3':
-        // Gantt
-        attachGanttEvents(processedData);
         break;
     }
     
