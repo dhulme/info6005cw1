@@ -22,8 +22,8 @@ section.content {
   display: none;
 }
 
-.panel h5 {
-  font-weight: bold;
+.panel p {
+  font-size: 0.9em;
 }
 
 

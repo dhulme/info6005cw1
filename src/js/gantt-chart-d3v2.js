@@ -119,14 +119,8 @@ d3.gantt = function() {
       })
       .attr('width', function(d) { 
         return (x(d.endDate) - x(d.startDate)); 
-      })
-      .attr('data-start-date', function(d) {
-        return getQuickDate(d.startDate);
-      })
-      .attr('data-end-date', function(d) {
-        return getQuickDate(d.endDate);
       });
-	 
+      
     svg.append('g')
       .attr('class', 'y axis')
       .transition()

@@ -37,16 +37,30 @@
         </div>
         <div class="small-4 column">
           <div class="panel">
-            <h5>US Spending</h5>
-            <p>This infographic shows US spending across agencies, investments
-             and projects.</p>
+            <h3>US Spending</h3>
+            <h5>What does it show?</h5>
+            <p>It shows the planned and actual US spending across the different
+              government agencies, investments and projects.</p>
+            
+            <h5>How is it interactive?</h5>
+            <p>Users can get a description of any wedge by hovering over it. 
+              They can click on any parent wedge to zoom in and see its children
+              in more detail. Finally users can toggle at any time between planned
+              and actual spending.</p>
+            
+            <h5>Who is it for?</h5>
+            <p>The infographic is aimed at interested members of the public who
+              want to quickly see how government money is spent and any variances in
+              planned and actual spending.</p>
+            
+            <hr>
             
             <form id="sunburstControls">
-              <input type="radio" name="spendingRadios" id="actualSpendingRadio" checked>
-              <label for="actualSpendingRadio">Actual</label>
-              
               <input type="radio" name="spendingRadios" id="plannedSpendingRadio">
               <label for="plannedSpendingRadio">Planned</label>
+              
+              <input type="radio" name="spendingRadios" id="actualSpendingRadio" checked>
+              <label for="actualSpendingRadio">Actual</label>
               
               <button type="button" class="button tiny" id="resetSunburstButton" >Reset</button>
             </form>
@@ -64,19 +78,31 @@
       <div class="row">
         <div class="small-12 column">
           <div class="panel">
-            <h5>Project Gantt Chart</h5>
-            <p>Blah blah blah</p>
-            
-            <form id="ganttControls">
-              <label for="departmentSelect">Department</label>
-              <select id="departmentSelect">
-              </select>
-              
-              <label for="investmentSelect">Investment</label>
-              <select id="investmentSelect">
-                
-              </select>
-            </form>
+            <div class="row">
+              <div class="small-6 column">
+                <h3>Project Gantt Chart</h3>
+                <h5>What does it show?</h5>
+                <p>Through a Gantt chart it shows the the allocation of time 
+                  between the projects that comprise each investment.</p>
+
+                <h5>How is it interactive?</h5>
+                <p>By using the two drop down menus, users can show the Gantt chart
+                  for the exact investment they are looking for.</p>
+
+                <h5>Who is it for?</h5>
+                <p>Primarily aimed at managers within government agencies who
+                  would be able to see how long each project took.</p>
+              </div>
+              <div class="small-6 column">
+                <form id="ganttControls">
+                  <label for="agencySelect">Agency</label>
+                  <select id="agencySelect"></select>
+
+                  <label for="investmentSelect">Investment</label>
+                  <select id="investmentSelect"></select>
+                </form>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -89,8 +115,19 @@
         </div>
         <div class="small-4 column">
           <div class="panel">
-            <h5>US Spending Variance</h5>
-            <p>Blah blah blah</p>
+            <h3>US Spending Variance</h3>
+            <h5>What does it show?</h5>
+            <p>It shows which agencies overspent and saved the most money,
+              both as a percentage of their budgets and in real terms.</p>
+
+            <h5>How is it interactive?</h5>
+            <p>Users can change between seeing the percentage and cash values.</p>
+
+            <h5>Who is it for?</h5>
+            <p>Aimed at members of the public who want to quickly see which government
+              agencies are overspending.</p>
+            
+            <hr>
             
             <form id="barControls">
               <input type="radio" name="spendingRadios" id="percentageVarianceRadio" checked>

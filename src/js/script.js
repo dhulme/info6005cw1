@@ -37,7 +37,7 @@ function processData(data) {
     .entries(data);
     
   var tree = {
-    key: 'United States',
+    key: 'US Departments',
     values: nest
   };
 
@@ -131,9 +131,11 @@ function drawSunburst(root) {
         return d.key || d.projectName;
       })
       .on('click', function(d) {
-        path.transition()
-          .duration(750)
-          .attrTween('d', zoom(d));
+        if (!d.depth || d.depth < 3) {
+          path.transition()
+            .duration(750)
+            .attrTween('d', zoom(d));
+        }
       })
       .each(function(d) {
         // Stash old values for transition
@@ -371,15 +373,15 @@ function drawGantt(tasks) {
 }
 
 function attachGanttEvents(data) {
-  var departmentSelect = $('#departmentSelect')
+  var agencySelect = $('#agencySelect')
     , investmentSelect = $('#investmentSelect');
   
   // Set up department combo values
-  var departmentSelectHTML = '';
+  var agencySelectHTML = '';
   data.values.forEach(function(department, index) {
-    departmentSelectHTML += '<option value="' + index + '">' + department.key + '</option>';
+    agencySelectHTML += '<option value="' + index + '">' + department.key + '</option>';
   });
-  departmentSelect.html(departmentSelectHTML);
+  agencySelect.html(agencySelectHTML);
   
   var updateInvestmentList = function(values) {
     // And for investment combo (with default option)
@@ -392,8 +394,8 @@ function attachGanttEvents(data) {
   
   // Set up listeners
   // On department change, update investments
-  departmentSelect.change(function() {
-    var selected = departmentSelect.find(':selected')
+  agencySelect.change(function() {
+    var selected = agencySelect.find(':selected')
       , departmentIndex = Number(selected.val())
       , investmentIndex = investmentSelect.find('option').first().val();
       
@@ -403,7 +405,7 @@ function attachGanttEvents(data) {
   
   investmentSelect.change(function() {
     var selected = investmentSelect.find(':selected')
-      , departmentIndex = departmentSelect.find(':selected').val()
+      , departmentIndex = agencySelect.find(':selected').val()
       , investmentIndex = Number(selected.val());
       
     drawGantt(data.values[departmentIndex].values[investmentIndex].values);
@@ -412,25 +414,6 @@ function attachGanttEvents(data) {
   // Draw default gantt
   updateInvestmentList(data.values[0].values);
   drawGantt(data.values[0].values[0].values);
-  
-  // Attach hover events
-  var tooltip = $('#tooltip');
-  $('#ganttSvg rect')
-    .mouseover(function(e) {
-      var self = $(this);
-      debugger
-      
-      var tooltipContent = self.data('startDate') + ' - ' + self.data('endDate');
-      
-      tooltip
-        .show()
-        .css('left', e.clientX + 10)
-        .css('top', e.clientY)
-        .find('.content').html(tooltipContent);
-    })
-    .mouseleave(function(e) {
-      tooltip.hide();
-    });
 }
 
 function loadDataset(done) {
