@@ -34,10 +34,8 @@ section.content {
 #barSvg .bar-overlay {
   display: none;
   fill: #fff;
-}
-
-#barSvg text {
-  text-anchor: end;
+  text-anchor: start;
+  font-size: 13px;
 }
 
 .axis path,

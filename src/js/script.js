@@ -320,10 +320,10 @@ function drawBar(data, percentageMode) {
   g.append('text')
     .attr('class', 'bar-overlay')
     .attr('x', function(d) {
-      return x(d[dataAttr]) - 3;
+      return x(0) + 5;
     })
     .attr('y', barHeight / 2)
-    .attr('dy', '.35em')
+    .attr('dy', '.3em')
     .text(generateBarText)
     .each(function(d) {
       // Show label if it's smaller than the bar size
@@ -412,6 +412,25 @@ function attachGanttEvents(data) {
   // Draw default gantt
   updateInvestmentList(data.values[0].values);
   drawGantt(data.values[0].values[0].values);
+  
+  // Attach hover events
+  var tooltip = $('#tooltip');
+  $('#ganttSvg rect')
+    .mouseover(function(e) {
+      var self = $(this);
+      debugger
+      
+      var tooltipContent = self.data('startDate') + ' - ' + self.data('endDate');
+      
+      tooltip
+        .show()
+        .css('left', e.clientX + 10)
+        .css('top', e.clientY)
+        .find('.content').html(tooltipContent);
+    })
+    .mouseleave(function(e) {
+      tooltip.hide();
+    });
 }
 
 function loadDataset(done) {
@@ -486,7 +505,7 @@ function attachGlobalEvents(processedData) {
       case 'visualisation3':
         // Bar
         var barData = processedData.values;
-        drawBar(barData, false);
+        drawBar(barData, true);
         attachBarEvents(barData);
         break;
     }
