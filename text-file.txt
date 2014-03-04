@@ -1,0 +1,28 @@
+INFO6005 Coursework 1
+=====================
+
+Contents
+--------
+1. Set up
+2. Data Cleaning
+3. Visualisations
+4. Exceptional Features
+
+1. Set up
+---------
+Extract src.zip to a directory. Expose the directory to a web server and visit
+the directory in the latest version of a major web browser.
+
+2. Data Cleaning
+----------------
+This section details some of the errors I found in the dataset and how I went
+about fixing them. I used two tools for data cleaning: Open Refine (a data
+cleaning tool) and Notepad++ (an advanced text editor).
+
+1. 
+
+3. Visualisations
+-----------------
+
+4. Exceptional Features
+-----------------------
