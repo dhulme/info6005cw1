@@ -8,10 +8,12 @@ Contents
 3. Visualisations
 4. Exceptional Features
 
+
 1. Set up
 ---------
 Extract src.zip to a directory. Expose the directory to a web server and visit
 the directory in the latest version of a major web browser.
+
 
 2. Data Cleaning
 ----------------
@@ -19,10 +21,36 @@ This section details some of the errors I found in the dataset and how I went
 about fixing them. I used two tools for data cleaning: Open Refine (a data
 cleaning tool) and Notepad++ (an advanced text editor).
 
-1. 
+1. Offset data
+      A large chunk of the data was offset with many empty cells preceding the
+      data. The selection tool from Notepad++ was used to select the empty cells
+      and remove them. This was quicker than finding an equivalent tool in
+      Open Refine.
+      
+2. Discrepancies in agency names and investment titles
+      Many of the agency names and investment titles representing the same
+      category varied slightly. For example 'Department of Agriculture' may have
+      been spelt wrong, had white space after the last character, or have the
+      prefix 'The'. These errors were fixed using the --- feature in Open Refine.
+
+3. Numerical data errors
+(department numbers)
+
+4. Syntax errors in CSV
+(commas in agency project ids)
+
+5. Mixed data types
+($m in some numbers and wrong date type)
+
 
 3. Visualisations
 -----------------
+3.1 Visualisation 1
+
+3.2 Visualisation 2
 
 4. Exceptional Features
 -----------------------
+Visualisation 1 allows you to see the difference between the planned and actual
+spending of different agencies. To allow users to compare which agencies had
+the greatest difference I created a third visualisation.
