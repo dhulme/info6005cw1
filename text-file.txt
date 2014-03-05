@@ -1,13 +1,6 @@
 INFO6005 Coursework 1
 =====================
-
-Contents
---------
-1. Set up
-2. Data Cleaning
-3. Visualisations
-4. Exceptional Features
-
+http://users.ecs.soton.ac.uk/dh7g10/info6005cw1/
 
 1. Set up
 ---------
@@ -18,8 +11,9 @@ the directory in the latest version of a major web browser.
 2. Data Cleaning
 ----------------
 This section details some of the errors I found in the dataset and how I went
-about fixing them. I used two tools for data cleaning: Open Refine (a data
-cleaning tool) and Notepad++ (an advanced text editor).
+about fixing them. I used three tools for data cleaning: Open Refine (a data
+cleaning tool), Notepad++ (an advanced text editor) and Microsoft Excel (a
+spreadsheet application).
 
 1. Offset data
       A large chunk of the data was offset with many empty cells preceding the
@@ -34,14 +28,28 @@ cleaning tool) and Notepad++ (an advanced text editor).
       prefix 'The'. These errors were fixed using the --- feature in Open Refine.
 
 3. Numerical data errors
-(department numbers)
+      Some cells in the dataset contained errors, for example some of the cells
+      in the ''Agency Code'' column. These errors could be corrected safely by
+      examining the surrounding data. They were found simply by examining the
+      data in Notepad++ and looking for inconsistencies. [maybe I should have done this on googley?]
 
 4. Syntax errors in CSV
-(commas in agency project ids)
-
+      Some rows contained syntax errors that would cause the data to be misread.
+      CSV files use commas to separate cells. If a comma is to be used safely in
+      the file, that cell should be contained in quotes. Some 'Agency Project 
+      ID's contained commas causing an extra cell to be added in those rows.
+      These rows were found by looking through the dataset in Excel to find
+      those rows with an extra column.
+      
 5. Mixed data types
-($m in some numbers and wrong date type)
-
+      If the data types vary within a column, problems can occur when the data
+      is processed. For example, the 'Planned Cost ($ M)' and 'Projected/Actual
+      Cost ($ M)' columns contained numerical data, but some of the cells
+      contained the text '($m)' which would prevent those cells having numerical
+      operations performed on them. These errors were corrected with a regular
+      expression in Notepad++. Some cells contained varying data formats, for
+      example one cell contained a date formatted at 'DD-MM-YYYY' as supposed to
+      all the other cells formatted as 'DD/MM/YYYY'.
 
 3. Visualisations
 -----------------
