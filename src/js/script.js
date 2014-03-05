@@ -197,7 +197,7 @@ function drawSunburst(root) {
 function attachSunburstEvents() {
   var tooltip = $('#tooltip');
   $('#sunburstSvg path')
-    .mouseover(function(e) {
+    .mouseover(function() {
       var self = $(this);
       
       var costMillions = $('#actualSpendingRadio').prop('checked')
@@ -224,15 +224,7 @@ function attachSunburstEvents() {
         .css('top', averageTop + scrollTop)
         .find('.content').html(tooltipContent);
     })
-    .mouseleave(function(e) {
-      if (typeof e.toElement.className === 'string') {
-        if (!e.toElement.className.match(/tooltip/)) {
-          tooltip.hide();
-        }
-      } else {
-        tooltip.hide();
-      }
-    });
+    .mouseleave(tooltipMouseLeave);
     
   tooltip.mouseleave(function() {
     tooltip.hide();
@@ -358,16 +350,25 @@ function drawBar(data, percentageMode) {
 function attachBarEvents(data) {
   var tooltip = $('#tooltip');
   $('#barSvg .bar, .bar-overlay')
-    .mouseover(function(e) {
+    .mouseover(function() {
+      // Get x and y coordinates
+      var selfDom = $(this).get(0)
+        , boundingRect = selfDom.getBoundingClientRect()
+        , top = boundingRect.top - 10
+        , right = boundingRect.left + boundingRect.width + 10
+        , scrollTop = $(document).scrollTop();
+      
       tooltip
         .show()
-        .css('left', e.clientX + 10)
-        .css('top', e.clientY - 10)
+        .css('left', right)
+        .css('top', top + scrollTop)
         .find('.content').html($(this).data('tooltipContent'));
     })
-    .mouseleave(function(e) {
-      tooltip.hide();
-    });
+    .mouseleave(tooltipMouseLeave);
+    
+  tooltip.mouseleave(function() {
+    tooltip.hide();
+  });
     
   $('#barControls input').change(function(e) {
     drawBar(data, (this.id === 'percentageVarianceRadio'));
@@ -532,3 +533,14 @@ jQuery.fn.d3Click = function () {
     e.dispatchEvent(evt);
   });
 };
+
+function tooltipMouseLeave(e) {
+  var tooltip = $('#tooltip');
+  if (typeof e.toElement.className === 'string') {
+    if (!e.toElement.className.match(/tooltip/)) {
+      tooltip.hide();
+    }
+  } else {
+    tooltip.hide();
+  }
+}
