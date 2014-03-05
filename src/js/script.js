@@ -235,7 +235,7 @@ function attachSunburstEvents() {
   });
 }
 
-// Functioned modified from http://bost.ocks.org/mike/bar/2/
+// Modified from http://bost.ocks.org/mike/bar/2/
 function drawBar(data, percentageMode) {
   // Remove all child elements that may exist
   $('#barSvg').empty();

@@ -128,6 +128,7 @@ d3.gantt = function() {
       .transition()
       .call(yAxis);
       
+    // Idea based on http://stackoverflow.com/a/19451165/721675
     svg.selectAll('.y.axis text').each(function() {
       var self = $(this);
       if (self.width() > margin.left) {
