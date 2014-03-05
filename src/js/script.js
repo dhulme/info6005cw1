@@ -7,6 +7,10 @@ $(function() {
     var processedData = processData(rawData);
     // Initialize global UI
     $(document).foundation();
+    
+    // Hide loading screen
+    $('#loading').hide();
+    
     attachGlobalEvents(processedData);
   });
 });

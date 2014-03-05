@@ -19,7 +19,7 @@ section.content {
   display: block;
 }
 
-#visualisation2, #visualisation3 {
+.visualisation {
   display: none;
 }
 
@@ -48,4 +48,9 @@ section.content {
 
 #ganttSvg .tick text {
   font-size: 12px;
+}
+
+#loading {
+  text-align: center;
+  margin-top: 15%;
 }
