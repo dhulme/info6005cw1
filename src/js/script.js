@@ -70,7 +70,7 @@ function processData(data) {
   return tree;
 }
 
-// Function modified from http://bl.ocks.org/mbostock/406342 and
+// Modified from http://bl.ocks.org/mbostock/406342 and
 // http://bl.ocks.org/mbostock/4348373
 function drawSunburst(root) {
   var width = $('#sunburstSvg').parents('.svg-container').width()
@@ -209,15 +209,34 @@ function attachSunburstEvents() {
       
       var tooltipContent = self.data('title') + ' (' + cost2DP + ' $M)';
       
+      
+      // Get x and y coordinates
+      var selfDom = self.get(0)
+        , boundingRect = selfDom.getBoundingClientRect()
+        , averageTop = boundingRect.top + (boundingRect.height / 2)
+        , averageLeft = boundingRect.left + (boundingRect.width / 2)
+        , scrollTop = $(document).scrollTop();
+      
+      
       tooltip
         .show()
-        .css('left', e.clientX + 10)
-        .css('top', e.clientY)
+        .css('left', averageLeft + 50)
+        .css('top', averageTop + scrollTop)
         .find('.content').html(tooltipContent);
     })
     .mouseleave(function(e) {
-      tooltip.hide();
+      if (typeof e.toElement.className === 'string') {
+        if (!e.toElement.className.match(/tooltip/)) {
+          tooltip.hide();
+        }
+      } else {
+        tooltip.hide();
+      }
     });
+    
+  tooltip.mouseleave(function() {
+    tooltip.hide();
+  });
     
   $('#resetSunburstButton').click(function() {
     $('path').first().d3Click();
