@@ -7,7 +7,6 @@ http://users.ecs.soton.ac.uk/dh7g10/info6005cw1/
 Extract src.zip to a directory. Expose the directory to a web server and visit
 the directory in the latest version of a major web browser.
 
-
 2. Data Cleaning
 ----------------
 This section details some of the errors I found in the dataset and how I went
@@ -53,12 +52,12 @@ spreadsheet application).
 
 3. Visualisations
 -----------------
-3.1 Visualisation 1
-
-3.2 Visualisation 2
+For detailed information regarding the visualisations, please read the
+descriptions on the website.
 
 4. Exceptional Features
 -----------------------
 Visualisation 1 allows you to see the difference between the planned and actual
 spending of different agencies. To allow users to compare which agencies had
-the greatest difference I created a third visualisation.
+the greatest difference I created a third visualisation which went above the
+coursework specification requesting two.
