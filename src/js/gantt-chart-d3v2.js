@@ -1,9 +1,11 @@
 /**
- * @author Dimitry Kudrayvtsev
- * @version 2.1
+ * Original file Copyright 2012 Dimitry Kudryavtsev
+ * http://dk8996.github.io/Gantt-Chart/
+ * Licensed under the Apache License, Version 2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * File heavily modified by David Hulme
  */
-
-// Edited by David Hulme
 
 d3.gantt = function() {
   var margin = {
