@@ -139,6 +139,8 @@ function drawSunburst(root) {
           path.transition()
             .duration(750)
             .attrTween('d', zoom(d));
+    
+          attachSunburstEvents();
         }
       })
       .each(function(d) {
@@ -540,7 +542,7 @@ jQuery.fn.d3Click = function () {
 
 function tooltipMouseLeave(e) {
   var tooltip = $('#tooltip');
-  if (typeof e.toElement.className === 'string') {
+  if (e.toElement && typeof e.toElement.className === 'string') {
     if (!e.toElement.className.match(/tooltip/)) {
       tooltip.hide();
     }
