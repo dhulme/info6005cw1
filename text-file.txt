@@ -15,40 +15,44 @@ cleaning tool), Notepad++ (an advanced text editor) and Microsoft Excel (a
 spreadsheet application).
 
 1. Offset data
-      A large chunk of the data was offset with many empty cells preceding the
-      data. The selection tool from Notepad++ was used to select the empty cells
-      and remove them. This was quicker than finding an equivalent tool in
-      Open Refine.
+      Error:  A large chunk of the data was offset by several columns leading to
+              empty cells
+      Fix:    The selection tool from Notepad++ was used to remove the empty
+              cells. This was quicker than finding an equivalent tool in 
+              Open Refine.
       
 2. Discrepancies in agency names and investment titles
-      Many of the agency names and investment titles representing the same
-      category varied slightly. For example 'Department of Agriculture' may have
-      been spelt wrong, had white space after the last character, or have the
-      prefix 'The'. These errors were fixed using the --- feature in Open Refine.
+      Error:  Many of the agency names and investment titles representing the
+              same category varied slightly either through spelling, additional
+              white space or a different prefix. 
+      Fix:    These errors were fixed using the --- feature in Open Refine.
 
 3. Numerical data errors
-      Some cells in the dataset contained errors, for example some of the cells
-      in the ''Agency Code'' column. These errors could be corrected safely by
-      examining the surrounding data. They were found simply by examining the
-      data in Notepad++ and looking for inconsistencies. [maybe I should have done this on googley?]
+      Error:  Some cells contained errors, for example in the ''Agency Code''
+              column.
+      Fix:    They were found and corrected simply by examining the surrounding 
+              data in Notepad++ and looking for inconsistencies.
 
 4. Syntax errors in CSV
-      Some rows contained syntax errors that would cause the data to be misread.
-      CSV files use commas to separate cells. If a comma is to be used safely in
-      the file, that cell should be contained in quotes. Some 'Agency Project 
-      ID's contained commas causing an extra cell to be added in those rows.
-      These rows were found by looking through the dataset in Excel to find
-      those rows with an extra column.
+      Error:  CSV files use commas to separate cells. If a comma is to be used 
+              safely, cells with commas should be contained in quotes. Some 
+              'Agency Project ID's contained commas causing an extra cell to be
+              added in those rows.
+      Fix:    They were found by looking through the dataset in Excel to find
+              those rows with an extra column. Once found, the comma was removed
+              to bring it in line with the rest of the column.
       
 5. Mixed data types
-      If the data types vary within a column, problems can occur when the data
-      is processed. For example, the 'Planned Cost ($ M)' and 'Projected/Actual
-      Cost ($ M)' columns contained numerical data, but some of the cells
-      contained the text '($m)' which would prevent those cells having numerical
-      operations performed on them. These errors were corrected with a regular
-      expression in Notepad++. Some cells contained varying data formats, for
-      example one cell contained a date formatted at 'DD-MM-YYYY' as supposed to
-      all the other cells formatted as 'DD/MM/YYYY'.
+      Error:  If the data types vary within a column, problems can occur when
+              the data is processed. For example, the 'Planned Cost ($ M)' and 
+              'Projected/Actual Cost ($ M)' columns contained numerical data, 
+              but some cells contained the text '($m)' preventing those cells 
+              being read as numerical. Some cells contained varying data
+              formats, for example one cell contained a date formatted at
+              'DD-MM-YYYY' as supposed to all the other cells formatted as 
+              'DD/MM/YYYY'.
+      Fix:    They were corrected with a regular expressions and manual changes
+              in Notepad++. 
 
 3. Visualisations
 -----------------
