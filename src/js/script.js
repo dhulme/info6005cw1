@@ -312,8 +312,8 @@ function drawBar(data, percentageMode) {
       .style('text-anchor', 'middle')
       .text(function() {
         return percentageMode
-          ? 'Percentage of department budget spent'
-          : 'Deparment budget spend';
+          ? 'Percentage of agency budget spent'
+          : 'Agency budget spend';
       });
 
   var g = chart.selectAll('.bar').data(data).enter()
