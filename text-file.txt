@@ -5,7 +5,7 @@ http://users.ecs.soton.ac.uk/dh7g10/info6005cw1/
 1. Set up
 ---------
 Extract src.zip to a directory. Expose the directory to a web server and visit
-the directory in the latest version of a major web browser.
+the directory in the latest version of Google Chrome.
 
 2. Data Cleaning
 ----------------
