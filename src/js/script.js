@@ -141,6 +141,8 @@ function drawSunburst(root) {
             .attrTween('d', zoom(d));
     
           attachSunburstEvents();
+        } else {
+          $('#clickZoomAlert').show();
         }
       })
       .each(function(d) {
@@ -201,10 +203,13 @@ function drawSunburst(root) {
 }
 
 function attachSunburstEvents() {
-  var tooltip = $('#tooltip');
+  var tooltip = $('#tooltip')
+    , activePath;
+    
   $('#sunburstSvg path')
     .mouseover(function() {
       var self = $(this);
+      activePath = self;
       
       var costMillions = $('#actualSpendingRadio').prop('checked')
         ? self.data('projectedActualCostMillions')
@@ -234,6 +239,10 @@ function attachSunburstEvents() {
     
   tooltip.mouseleave(function() {
     tooltip.hide();
+  });
+  
+  tooltip.click(function() {
+    activePath.d3Click();
   });
     
   $('#resetSunburstButton').click(function() {
@@ -529,12 +538,11 @@ function attachGlobalEvents(processedData) {
   $('a[data-visualisation-id="' + hashId + '"]').click();
 }
 
-
 // From http://stackoverflow.com/questions/9063383/how-to-invoke-click-event-programmaticaly-in-d3
 jQuery.fn.d3Click = function () {
   this.each(function (i, e) {
-    var evt = document.createEvent("MouseEvents");
-    evt.initMouseEvent("click", true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+    var evt = document.createEvent('MouseEvents');
+    evt.initMouseEvent('click', true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
 
     e.dispatchEvent(evt);
   });
