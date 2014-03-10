@@ -25,7 +25,8 @@ spreadsheet application).
       Error:  Many of the agency names and investment titles representing the
               same category varied slightly either through spelling, additional
               white space or a different prefix. 
-      Fix:    These errors were fixed using the --- feature in Open Refine.
+      Fix:    These errors were fixed using the faceted search feature in 
+              Open Refine.
 
 3. Numerical data errors
       Error:  Some cells contained errors, for example in the ''Agency Code''
@@ -56,8 +57,7 @@ spreadsheet application).
 
 3. Visualisations
 -----------------
-For detailed information regarding the visualisations, please read the
-descriptions on the website.
+For detailed information visualisations 1 & 2, please see the web site.
 
 4. Exceptional Features
 -----------------------
