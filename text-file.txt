@@ -65,3 +65,17 @@ Visualisation 1 allows you to see the difference between the planned and actual
 spending of different agencies. To allow users to compare which agencies had
 the greatest difference I created a third visualisation which went above the
 coursework specification requesting two.
+
+5. Technologies
+---------------
+- D3 library to visualise data (because of the number of examples available 
+  and its robustness)
+- D3 Gantt plugin
+- Foundation front end framework
+- jQuery front end framework
+
+6. Summary
+----------
+I have aimed to produce engaging visualisations whilst writing well structured
+and maintainable code. The performance of Visualisation 1 is slightly sluggish
+due to the amount of data being processed.
